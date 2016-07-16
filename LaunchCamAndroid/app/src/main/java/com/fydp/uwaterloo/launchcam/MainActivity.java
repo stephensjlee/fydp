@@ -1,5 +1,11 @@
 package com.fydp.uwaterloo.launchcam;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,11 +14,21 @@ import android.support.v7.widget.Toolbar;
 
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.text.method.CharacterPickerDialog;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.fydp.uwaterloo.launchcam.Adapters.AppPagerAdapter;
+import com.fydp.uwaterloo.launchcam.Bluetooth.ConnectThread;
+import com.fydp.uwaterloo.launchcam.Bluetooth.ConnectedThread;
+
+import java.util.ArrayList;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    public ConnectedThread connectedThread;
+    BluetoothDevice capsuleBluetoothDevice = null;
+    Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +72,54 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mBluetoothAdapter.isDiscovering()) {
+                    mBluetoothAdapter.cancelDiscovery();
+                }
+                ConnectThread connect = new ConnectThread(capsuleBluetoothDevice, mBluetoothAdapter, mHandler);
+                connect.start();
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth
+            Utility.toast("No Blutooth Available", getApplicationContext());
+        }
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, 1);
+        }
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        for (BluetoothDevice pairedDevice : pairedDevices) {
+            if(Utility.BT_CAP_NAME.equals(pairedDevice.getName())){
+                capsuleBluetoothDevice = pairedDevice;
+            }
+            Log.d("Test", "onCreate: " +pairedDevice.getName());
+        }
 
+        mHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                Log.i(Utility.tag, "in handler");
+                super.handleMessage(msg);
+                switch (msg.what) {
+                    case Utility.SUCCESS_CONNECT:
+                        // DO something
+                        connectedThread = new ConnectedThread((BluetoothSocket) msg.obj, mHandler);
+                        Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
+                        Log.i(Utility.tag, "connected");
+                        break;
+                    case Utility.MESSAGE_READ:
+                        byte[] readBuf = (byte[]) msg.obj;
+                        String string = new String(readBuf);
+                        Toast.makeText(getApplicationContext(), string, Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        };
     }
-
+    BluetoothAdapter mBluetoothAdapter;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
