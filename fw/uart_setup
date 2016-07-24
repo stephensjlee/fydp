@@ -1,0 +1,1 @@
+sudo stty -F /dev/ttyUSB0 500000 cs8 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts
