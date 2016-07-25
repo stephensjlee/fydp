@@ -15,7 +15,7 @@ public class Utility {
     public static final int SUCCESS_CONNECT = 0;
     public static final int MESSAGE_READ = 1;
     public static String tag = "debugging";
-    static void toast(String msg, Context context){
+    public static void toast(String msg, Context context){
         Toast.makeText(context, msg,Toast.LENGTH_LONG).show();
     }
 
