@@ -67,6 +67,8 @@ if(!(e)) \
 
 #define SERVO_IN_POS 60
 #define SERVO_OUT_POS 43
+#define SERVO_POS_MIN 18
+#define SERVO_POS_MAX 75
 
 static void setup_mcu(void);
 static void setup_alti(void);
@@ -84,6 +86,9 @@ static uint32_t alti_c3 = 0;    // Temperature coefficient of pressure sensitivi
 static uint32_t alti_c4 = 0;    // Temperature coefficient of pressure offset
 static uint32_t alti_c5 = 0;    // Reference temperature
 static uint32_t alti_c6 = 0;    // Temperature coefficient of the temperature
+
+static uint8_t servopos = SERVO_IN_POS;
+static int32_t alti_gnd = 0;
 
 int main(void)
 {
@@ -114,11 +119,43 @@ int main(void)
         
         int32_t pressure_mbax_x100 = calculate_pressure_mbar_x100(d1, d2);
         int32_t alti_asl = calculate_altitude_ft(pressure_mbax_x100);
-        printf("%lu,%lu,%i,%i\n", d1, d2, pressure_mbax_x100, alti_asl);
+
+        if(U2STAbits.URXDA)
+        {
+            char c = U2RXREG;
+            _mon_putc(c);
+            LED = ~LED;
+
+            if(c == '=')
+            {
+                servopos++;
+            }
+            else if(c == '-')
+            {
+                servopos--;
+            }
+        }
+
+        if(U2STAbits.OERR)
+        {
+            U2STAbits.OERR = 0;
+        }
+
+        static uint8_t initial = 1;
+        if(initial)
+        {
+            alti_gnd = alti_asl;
+            initial = 0;
+        }
+
+        alti_gnd = (float)alti_asl*0.01f + (float)alti_gnd*0.99f;
+        int32_t alti_agl = alti_asl - alti_gnd;
+        
+        printf("%lu,%lu,%i,%i,%u,%i,%i\n", d1, d2, pressure_mbax_x100, alti_asl,servopos,alti_gnd, alti_agl);
         
         WDTCONbits.WDTCLR = 1;
         
-        OC1RS = 50;
+        OC1RS = servopos;
     }
 }
 
@@ -143,15 +180,18 @@ static void setup_mcu(void)
     U1MODEbits.STSEL = 1;   // 2 stop bits
     U1MODEbits.ON = 1;      // Turn UART peripheral OFF and reset it;    
     U1STAbits.UTXEN = 1;    // Transmitter enable, needs to be enabled AFTER U1MODE.ON is set!!
+    U1STAbits.URXEN = 1;    // Receiver enable, needs to be enabled AFTER U1MODE.ON is set!!
     
     // UART 2 setup
-    U2BRG = 0;              // Baud rate = 500k for 8MHz peripheral clock, 250k for 4MHz peripheral clock
+    U2BRG = 16;             // Baud rate = 117647 for 8MHz peripheral clock and BRGH=1, 250k for 4MHz peripheral clock and BRGH=1
     U2MODEbits.ON = 0;      // Turn UART peripheral OFF and reset it;
     asm volatile("nop");    // Can't set UART SFRs in immediate clock cycle after resetting the ON bit
     U2MODEbits.SIDL = 1;    // Stop in IDLE mode
     U2MODEbits.STSEL = 1;   // 2 stop bits
+    U2MODEbits.BRGH = 1;    // High speed mode
     U2MODEbits.ON = 1;      // Turn UART peripheral OFF and reset it;    
     U2STAbits.UTXEN = 1;    // Transmitter enable, needs to be enabled AFTER U1MODE.ON is set!!
+    U2STAbits.URXEN = 1;    // Receiver enable, needs to be enabled AFTER U1MODE.ON is set!!
     
     // Timers
     T1CONbits.ON = 0;
