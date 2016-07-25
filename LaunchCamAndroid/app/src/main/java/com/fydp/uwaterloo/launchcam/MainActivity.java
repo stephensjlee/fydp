@@ -111,11 +111,13 @@ public class MainActivity extends AppCompatActivity {
                     case Utility.SUCCESS_CONNECT:
                         // DO something
                         connectedThread = new ConnectedThread((BluetoothSocket) msg.obj, mHandler);
+                        connectedThread.start();
                         Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
                         Log.i(Utility.tag, "connected");
                         break;
                     case Utility.MESSAGE_READ:
                         byte[] readBuf = (byte[]) msg.obj;
+//                        Log.
                         String string = new String(readBuf);
                         Toast.makeText(getApplicationContext(), string, Toast.LENGTH_SHORT).show();
                         break;
@@ -147,4 +149,12 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if(connectedThread != null){
+            connectedThread.cancel();
+        }
+    }
 }
