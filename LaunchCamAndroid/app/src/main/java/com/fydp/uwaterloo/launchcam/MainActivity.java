@@ -117,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case Utility.MESSAGE_READ:
                         byte[] readBuf = (byte[]) msg.obj;
-//                        Log.
                         String string = new String(readBuf);
                         Toast.makeText(getApplicationContext(), string, Toast.LENGTH_SHORT).show();
                         break;
