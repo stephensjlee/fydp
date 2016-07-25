@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.fydp.uwaterloo.launchcam.MainActivity;
 import com.fydp.uwaterloo.launchcam.R;
+import com.fydp.uwaterloo.launchcam.Utility;
 
 /**
  * Created by Said Afifi on 15-Jul-16.
@@ -27,7 +28,11 @@ public class BluetoothFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String tmp = "*"+editText.getText().toString();
-                ((MainActivity) getActivity()).connectedThread.write(tmp.getBytes());
+                if(((MainActivity) getActivity()).connectedThread != null)
+                    ((MainActivity) getActivity()).connectedThread.write(tmp.getBytes());
+                else{
+                    Utility.toast("No Bluetooth Connection", getActivity());
+                }
             }
         });
         return rootView;

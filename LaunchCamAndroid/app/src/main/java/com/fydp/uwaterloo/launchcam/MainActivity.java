@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     public ConnectedThread connectedThread;
     BluetoothDevice capsuleBluetoothDevice = null;
-    Handler mHandler;
+    private static Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
