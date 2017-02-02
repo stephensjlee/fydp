@@ -29,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
     int numOfBtns = 5;
     Button[] btns = new Button[numOfBtns];
 
+    final String GoPro_IP = "10.5.5.9";
+    final String GoPro_MAC = "f6dd9e2d1397"; //GoPro MAC address: f6-dd-9e-2d-13-97
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         btns[2] = (Button) findViewById(R.id.button2);
         btns[3] = (Button) findViewById(R.id.button3);
         btns[4] = (Button) findViewById(R.id.button4);
+        btns[5] = (Button) findViewById(R.id.button5);
+        btns[6] = (Button) findViewById(R.id.button6);
 
         btns[0].setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,6 +74,18 @@ public class MainActivity extends AppCompatActivity {
                 button4();
             }
         });
+        btns[5].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                button5();
+            }
+        });
+        btns[6].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                button6();
+            }
+        });
     }
 
     void button0() {
@@ -95,6 +112,42 @@ public class MainActivity extends AppCompatActivity {
     void button4() {
         Toast.makeText(this,
                 "btn4", Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * Power Off the GoPro
+     */
+    void button5() {
+        new GetRequest().execute("http://10.5.5.9/gp/gpControl/command/system/sleep");
+    }
+
+    /**
+     * Power On the GoPro
+     */
+    void button6() {
+
+        int port = 9;
+        // Check MAC address format and try to compensate.
+        if(GoPro_MAC.length() != 12){
+            if(GoPro_MAC.length() == 12+5){
+                GoPro_MAC = GoPro_MAC.replace(GoPro_MAC.charAt(2), '\u0000');
+            } else{
+                throw new Exception("Incorrect MAC address format");
+            }
+        }
+//  If we want to use StringUtils lib
+//    String repeated = StringUtils.repeat(str, 3);
+        String data = "FFFFFFFFFFFF";
+        data = data.concat(new String(new char[20]).replace("\0", GoPro_MAC));
+
+        System.out.println("Connecting to " + GoPro_IP + " on port " + port);
+        Socket client = new Socket(GoPro_IP, port);
+
+        System.out.println("Just connected to " + client.getRemoteSocketAddress());
+        OutputStream outToServer = client.getOutputStream();
+        DataOutputStream out = new DataOutputStream(outToServer);
+        out.writeChars(data);
+        client.close();
     }
 
     private void msg(String msg) {
