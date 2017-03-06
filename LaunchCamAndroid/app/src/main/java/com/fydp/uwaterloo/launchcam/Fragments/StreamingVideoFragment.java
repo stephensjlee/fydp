@@ -21,15 +21,15 @@ public class StreamingVideoFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.video_stream_layout, container, false);
 
-//        setContentView(R.layout.main);
-        mVideoView = (io.vov.vitamio.widget.VideoView) rootView.findViewById(R.id.lilwayne);
-//                findViewById(R.id.vitamio_videoView);
-        mVideoView.setBufferSize(1);
-        String path = "http://10.5.5.9:8080/live/amba.m3u8";
-        mVideoView.setVideoPath(path);
-        mVideoView.setMediaController(new io.vov.vitamio.widget.MediaController(getActivity()));
-        mVideoView.requestFocus();
-        mVideoView.start();
+////        setContentView(R.layout.main);
+//        mVideoView = (io.vov.vitamio.widget.VideoView) rootView.findViewById(R.id.lilwayne);
+////                findViewById(R.id.vitamio_videoView);
+//        mVideoView.setBufferSize(1);
+//        String path = "http://10.5.5.9:8080/live/amba.m3u8";
+//        mVideoView.setVideoPath(path);
+//        mVideoView.setMediaController(new io.vov.vitamio.widget.MediaController(getActivity()));
+//        mVideoView.requestFocus();
+//        mVideoView.start();
         return rootView;
     }
 }
