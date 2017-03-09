@@ -46,7 +46,7 @@ public class AppPagerAdapter extends android.support.v4.app.FragmentPagerAdapter
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "Bluetooth Write";
+                return "Controls";
             case 1:
                 return "Data Analysis";
             case 2:

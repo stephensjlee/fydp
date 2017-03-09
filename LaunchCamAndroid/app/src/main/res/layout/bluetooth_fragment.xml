@@ -1,20 +1,230 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="30dp">
+    android:padding="30dp"
+    android:weightSum="1">
 
-    <EditText
-        android:id="@+id/msg_bt_et"
+    <!--<EditText-->
+        <!--android:id="@+id/msg_bt_et"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textSize="20sp"-->
+        <!--android:padding="10dp"/>-->
+    <!--<Button-->
+        <!--android:id="@+id/send_btn"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="SEND"-->
+        <!--android:gravity="center"-->
+        <!--android:layout_gravity="center"/>-->
+
+    <Space
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:padding="10dp"/>
-    <Button
-        android:id="@+id/send_btn"
+        android:layout_weight="0.22" />
+
+    <RelativeLayout
+        android:id="@+id/info_box"
+        android:layout_width="261dp"
+        android:layout_height="102dp"
+        android:layout_gravity="center|bottom"
+        android:background="@drawable/border"
+        android:layout_weight="0.11">
+
+        <ImageView
+            android:id="@+id/battery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/battery_4"
+            android:layout_gravity="end"
+            android:gravity="end"
+            android:layout_marginTop="10dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp" />
+
+        <ImageView
+            android:id="@+id/wifi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/wifi_full"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignBottom="@+id/battery" />
+
+        <!--android:text="05:10.324 s"-->
+        <!--android:gravity="center"-->
+        <!--android:padding="5dp"-->
+        <!--android:textSize="35dp"-->
+        <!--android:textColor="#000000"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="46dp"-->
+        <!--android:layout_marginTop="10dp" />-->
+
+        <TextView
+            android:id="@+id/resolution"
+            android:text="1080p-120Hz"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="19dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="10dp"
+            android:padding="5dp"
+            android:textSize="20dp"
+            android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/aspect_ratio"
+        android:text="Wide"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SEND"
+        android:layout_alignBottom="@+id/resolution"
+        android:layout_alignEnd="@+id/battery"
+        android:padding="5dp"
+        android:textSize="20dp"
+        android:textColor="#000000" />
+</RelativeLayout>
+
+<!--<EditText-->
+        <!--android:id="@+id/timer"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:inputType="time"-->
+        <!--android:ems="10"-->
+        <!--android:layout_weight="0.22"-->
+        <!--android:layout_marginTop="10dp"/>-->
+
+    <TextView
+        android:id="@+id/timer"
+        android:text="05:10.324 s"
         android:gravity="center"
-        android:layout_gravity="center"/>
+        android:padding="5dp"
+        android:textSize="35dp"
+        android:textColor="#000000"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/record_fab"
+        android:layout_width="69dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@android:color/holo_red_light" />
+
+
+    <RelativeLayout
+        android:id="@+id/controls_box"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_gravity="center"
+        android:layout_weight="0.16">
+
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/options_fab"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:src="@drawable/options_horizontal_outline"-->
+            <!--app:backgroundTint="@android:color/white"-->
+            <!--android:layout_alignParentLeft="true"-->
+            <!--android:layout_marginLeft="@dimen/fab_margin"-->
+            <!--android:layout_marginRight="@dimen/fab_margin"-->
+            <!--android:layout_marginTop="@dimen/fab_margin"-->
+            <!--android:layout_alignParentBottom="true" />-->
+
+        <Button
+            android:id="@+id/options_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_view_module_black_48dp"
+            app:backgroundTint="@android:color/white"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true" />
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+        <Button
+            android:id="@+id/bluetooth_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_bluetooth_black_48dp"
+            app:backgroundTint="@android:color/black"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true" />
+
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/bluetooth_fab"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_margin="@dimen/fab_margin"-->
+            <!--android:src="@drawable/ic_bluetooth_white_48dp"-->
+            <!--app:backgroundTint="@android:color/white"-->
+            <!--android:layout_alignParentRight="true" />-->
+
+        <!--<Button-->
+            <!--android:id="@+id/options_btn"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentStart="true"-->
+            <!--android:background="@drawable/options_horizontal_outline"-->
+            <!--android:layout_toStartOf="@+id/switchButton"-->
+            <!--android:layout_alignParentTop="true"-->
+            <!--android:layout_alignBottom="@+id/bluetooth_fab" />-->
+
+    </RelativeLayout>
+
+    <!--<LinearLayout-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!--android:gravity="center">-->
+
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/options_fab"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="bottom|start|left"-->
+            <!--android:gravity="bottom|start"-->
+            <!--android:layout_margin="@dimen/fab_margin"-->
+            <!--android:src="@drawable/options_horizontal_outline"-->
+            <!--app:backgroundTint="@android:color/white" />-->
+
+        <!--<android.support.v7.widget.SwitchCompat-->
+            <!--android:id="@+id/switchButton"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:gravity="center" />-->
+
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/bluetooth_fab"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="bottom|end|right"-->
+            <!--android:gravity="bottom|end|right"-->
+            <!--android:layout_margin="@dimen/fab_margin"-->
+            <!--android:src="@drawable/ic_bluetooth_white_48dp"-->
+            <!--app:backgroundTint="@android:color/white" />-->
+
+
+        <!--&lt;!&ndash;<ImageView&ndash;&gt;-->
+        <!--&lt;!&ndash;android:id="@+id/bluetooth_btn"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_width="40dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_height="40dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:padding="5dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_gravity="center|bottom"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:src="@drawable/ic_bluetooth_white_48dp" />&ndash;&gt;-->
+
+    <!--</LinearLayout>-->
+
 </LinearLayout>
