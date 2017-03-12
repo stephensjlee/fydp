@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +19,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.fydp.uwaterloo.launchcam.MainActivity;
+import com.fydp.uwaterloo.launchcam.Model.CameraModel;
+import com.fydp.uwaterloo.launchcam.Model.CameraStatusModel;
 import com.fydp.uwaterloo.launchcam.R;
+import com.fydp.uwaterloo.launchcam.Service.CameraService;
+import com.fydp.uwaterloo.launchcam.Service.ServiceFactory;
 import com.fydp.uwaterloo.launchcam.Utility;
+
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Said Afifi on 15-Jul-16.
@@ -28,6 +37,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
 
     View rootView = null;
     private boolean isRecording = false;
+    CameraService service;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,6 +75,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
 
 //        ImageView bluetoothBtn = (ImageView) rootView.findViewById(R.id.bluetooth_btn);
 //        redCircle.getDrawable().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY );
+        service = ServiceFactory.createRetrofitService(CameraService.class, CameraService.SERVICE_ENDPOINT);
         return rootView;
     }
 
@@ -87,8 +98,14 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
 
                 if(!isRecording){
                     // send command to record
+                    service.record(1).subscribeOn(Schedulers.newThread())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe();
                 } else{
                     // send command to stop recording
+                    service.record(0).subscribeOn(Schedulers.newThread())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe();
                 }
                 isRecording = !isRecording;
                 break;
@@ -104,6 +121,26 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                     wifiIcon.setImageResource(R.drawable.wifi_full);
                     wifiIcon.setTag(R.drawable.wifi_full);
                 }
+                service.getStatus()
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<CameraStatusModel>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(CameraStatusModel cameraStatusModel) {
+                                Log.d("getStatus",  ""+cameraStatusModel.getStatusModel().getBattery() );
+                            }
+                        });
+
                 break;
             case R.id.bluetooth_btn:
                 Utility.toast("Bluetooth", getActivity());
