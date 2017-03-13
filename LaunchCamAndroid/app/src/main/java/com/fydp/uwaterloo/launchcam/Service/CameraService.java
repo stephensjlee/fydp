@@ -15,4 +15,6 @@ public interface CameraService {
     Observable<CameraStatusModel> getStatus();
     @GET("/command/shutter")
     Observable<CameraModel> record(@Query("p") int isRecord);
+    @GET("/command/mode")
+    Observable<CameraModel> primaryMode(@Query("p") int primaryMode);
 }

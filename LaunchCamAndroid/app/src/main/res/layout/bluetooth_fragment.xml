@@ -117,7 +117,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center|bottom"
         android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="@android:color/holo_red_light" />
+        app:backgroundTint="@android:color/holo_red_light"
+        android:tag="videoMode"/>
 
 
     <RelativeLayout
@@ -158,5 +159,6 @@
             app:backgroundTint="@android:color/white"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true" />
+
     </RelativeLayout>
 </LinearLayout>
