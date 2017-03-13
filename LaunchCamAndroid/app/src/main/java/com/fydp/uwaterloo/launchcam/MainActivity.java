@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case Utility.MESSAGE_READ:
                         byte[] readBuf = (byte[]) msg.obj;
+                        Log.d("data", new String(readBuf));
                         ((StreamingDataFragment)mAppPagerAdapter.getRegisteredFragment(1)).handleBTData(readBuf);
                         break;
                 }

@@ -37,7 +37,7 @@ public class ConnectedThread extends Thread {
     }
 
     public void run() {
-        byte[] buffer = new byte[255];  // buffer store for the stream
+        byte[] buffer = new byte[2015];  // buffer store for the stream
         int bytes; // bytes returned from read()
 
         // Keep listening to the InputStream until an exception occurs
@@ -47,7 +47,7 @@ public class ConnectedThread extends Thread {
                 bytes = mmInStream.read(buffer);
 
                 // Send the obtained bytes to the UI activity
-                //Log.d("ConnectThread", "bytesRead: " + bytes + " , " +  buffer.length);
+                Log.d("ConnectThread", "bytesRead: " + bytes + " , " +  buffer.length);
 
                 mHandler.obtainMessage(Utility.MESSAGE_READ, bytes, -1, buffer)
                         .sendToTarget();

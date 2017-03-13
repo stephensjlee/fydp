@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -21,7 +22,9 @@ import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYStepMode;
+import com.fydp.uwaterloo.launchcam.MainActivity;
 import com.fydp.uwaterloo.launchcam.R;
+import com.fydp.uwaterloo.launchcam.Utility;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -37,7 +40,6 @@ public class StreamingDataFragment extends Fragment {
     private static final int HISTORY_SIZE = 400;            // number of points to plot in history
 
     private XYPlot aprHistoryPlot = null;
-    private TextView tv = null;
 
     private SimpleXYSeries altitude;
     private SimpleXYSeries altitudeHistory = null;
@@ -57,8 +59,30 @@ public class StreamingDataFragment extends Fragment {
 
         // setup the APR History plot:
         aprHistoryPlot = (XYPlot) rootView.findViewById(R.id.aprHistoryPlot);
-        tv = (TextView) rootView.findViewById(R.id.statstv);
-
+        Button getDataBtn = (Button) rootView.findViewById(R.id.btn_getData);
+        Button selectLaunchBtn = (Button) rootView.findViewById(R.id.btn_selectLaunch);
+        Button clearGraphBtn = (Button) rootView.findViewById(R.id.btn_clearGraph);
+        getDataBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String tmp = "D";
+                if(((MainActivity) getActivity()).connectedThread != null)
+                    ((MainActivity) getActivity()).connectedThread.write(tmp.getBytes());
+                else{
+                    Utility.toast("No Bluetooth Connection", getActivity());
+                }
+            }
+        });
+        clearGraphBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int size = altitudeHistory.size();
+                for (int i = 0; i < size; i++) {
+                    altitudeHistory.removeFirst();
+                }
+                aprHistoryPlot.clear();
+            }
+        });
 
         altitudeHistory = new SimpleXYSeries("Az.");
         altitudeHistory.useImplicitXVals();
@@ -164,18 +188,18 @@ public class StreamingDataFragment extends Fragment {
     }
 
     public void draw(float value) {
-        //Log.d("data", ""+value);
-        // get rid the oldest sample in history:
-        if (altitudeHistory.size() > HISTORY_SIZE) {
-            altitudeHistory.removeFirst();
-        }
-
-        // add the latest history sample:
-        altitudeHistory.addLast(null, value);
-
-        // update level data:
-        altitude.setModel(Arrays.asList(value), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY);
-//        tv.setText(String.valueOf(value));
+//        Log.d("data", ""+value);
+//        // get rid the oldest sample in history:
+//        if (altitudeHistory.size() > HISTORY_SIZE) {
+//            altitudeHistory.removeFirst();
+//        }
+//
+//        // add the latest history sample:
+//        altitudeHistory.addLast(null, value);
+//
+//        // update level data:
+//        altitude.setModel(Arrays.asList(value), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY);
+////        tv.setText(String.valueOf(value));
     }
 
 }

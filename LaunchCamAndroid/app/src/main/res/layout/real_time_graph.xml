@@ -34,12 +34,30 @@
         android:layout_margin="0dp"
         android:layout_marginLeft="10px"
         android:layout_marginRight="10px"
-        android:layout_marginTop="10px"/>
-    <TextView
-        android:id="@+id/statstv"
+        android:layout_marginTop="10px" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:text="Test"/>
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_getData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/get_data"
+            android:layout_weight="1"/>
+        <Button
+            android:id="@+id/btn_selectLaunch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_launch"
+            android:layout_weight="1"/>
+        <Button
+            android:id="@+id/btn_clearGraph"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear_graph"
+            android:layout_weight="1"/>
+    </LinearLayout>
 
 </LinearLayout>
