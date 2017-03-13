@@ -29,9 +29,10 @@ public class StreamingVideoFragment extends Fragment implements AsyncResponse{
 
 
     @Override
-    public void processFinish(List<String> output) {
+    public void processFinish(List<String> videoFileNames, List<String> pictureFileNames) {
         this.output.clear();
-        this.output.addAll(output);
+        this.output.addAll(videoFileNames);
+        this.output.addAll(pictureFileNames);
         adapter.notifyDataSetChanged();
     }
 

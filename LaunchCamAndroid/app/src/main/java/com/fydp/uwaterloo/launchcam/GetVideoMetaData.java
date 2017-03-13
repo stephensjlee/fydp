@@ -59,6 +59,7 @@ public class GetVideoMetaData extends AsyncTask<String, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         List<String> videoFileNames = new ArrayList<>();
+        List<String> pictureFileNames = new ArrayList<>();
 
         super.onPostExecute(aVoid);
         try {
@@ -73,13 +74,16 @@ public class GetVideoMetaData extends AsyncTask<String, Void, Void> {
                         if(o.getString("n").contains("MP4")){
                             videoFileNames.add(o.getString("n").replace("MP4", "LRV"));
                         }
+                        if(o.getString("n").contains("JPG")){
+                            pictureFileNames.add(o.getString("n"));
+                        }
                     }
                 }
             }
         } catch (JSONException e) {
         }
-        System.out.println(videoFileNames);
-        delegate.processFinish(videoFileNames);
+
+        delegate.processFinish(videoFileNames, pictureFileNames);
     }
 
     @Override
