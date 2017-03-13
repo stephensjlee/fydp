@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
@@ -33,6 +34,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,6 +45,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 import static android.content.ContentValues.TAG;
+import static android.os.Looper.getMainLooper;
 
 /**
  * Created by Said Afifi on 15-Jul-16.
@@ -79,6 +84,9 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         Button camVidSwitch = (Button) rootView.findViewById(R.id.mediaSwitch);
         camVidSwitch.setOnClickListener(this);
 
+        //
+        final TextView timerTv = (TextView) rootView.findViewById(R.id.timer);
+
 //        final EditText editText = (EditText) rootView.findViewById(R.id.msg_bt_et);
 //        Button sendBtn = (Button) rootView.findViewById(R.id.send_btn);
 //        sendBtn.setOnClickListener(new View.OnClickListener() {
@@ -104,6 +112,14 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                 updateStatus();
             }
         }, 2000, 5000);
+        final Handler someHandler = new Handler(getMainLooper());
+        someHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                timerTv.setText(new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(new Date()));
+                someHandler.postDelayed(this, 1);
+            }
+        }, 10);
         return rootView;
     }
 
