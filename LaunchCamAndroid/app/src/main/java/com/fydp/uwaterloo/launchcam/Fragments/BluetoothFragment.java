@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.fydp.uwaterloo.launchcam.AsyncTasks.ConnectRequest;
 import com.fydp.uwaterloo.launchcam.MainActivity;
 import com.fydp.uwaterloo.launchcam.Model.CameraModel;
 import com.fydp.uwaterloo.launchcam.Model.CameraStatusModel;
@@ -58,6 +59,16 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
     private final String VIDEO_MODE = "videoMode";
     private final String PICTURE_MODE = "pictureMode";
 
+    TextView timerTv;
+    Handler clockHandler;
+    Runnable clockRunner = new Runnable() {
+        @Override
+        public void run() {
+            timerTv.setText(new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(new Date()));
+            clockHandler.postDelayed(this, 1);
+        }
+    };
+
     public enum Modes {
         VIDEO(0), PICTURE(1), MULTISHOT(2);
 
@@ -85,7 +96,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         camVidSwitch.setOnClickListener(this);
 
         //
-        final TextView timerTv = (TextView) rootView.findViewById(R.id.timer);
+        timerTv = (TextView) rootView.findViewById(R.id.timer);
 
 //        final EditText editText = (EditText) rootView.findViewById(R.id.msg_bt_et);
 //        Button sendBtn = (Button) rootView.findViewById(R.id.send_btn);
@@ -112,14 +123,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                 updateStatus();
             }
         }, 2000, 5000);
-        final Handler someHandler = new Handler(getMainLooper());
-        someHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                timerTv.setText(new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(new Date()));
-                someHandler.postDelayed(this, 1);
-            }
-        }, 10);
+        clockHandler = new Handler(getMainLooper());
         return rootView;
     }
 
@@ -145,6 +149,9 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                     batteryIcon.setTag(R.drawable.battery_4);
                 }
 
+
+
+                clockHandler.postDelayed(clockRunner, 10);
 
                 if(recordBtn.getTag().equals(VIDEO_MODE)){
                     if(!isRecording){
@@ -254,69 +261,5 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         service.primaryMode(mode).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
-    }
-
-    class ConnectRequest extends AsyncTask<String, Void, Void> {
-        String toPrint = "";
-        @Override
-        protected Void doInBackground(String... params) {
-            int port = 9;
-
-            String goPro_IP = "10.5.5.9";
-            String data = "FFFFFFFFFFFFf6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397f6dd9e2d1397";
-
-            byte[] dataToSend= new byte[data.length()/2];
-            for(int i = 0; i < data.length(); i+=2){
-                String hex = "0x" + data.substring(i, i+2);
-                int numba = Long.decode(hex).intValue();
-                dataToSend[i/2]=(byte)numba;
-                System.out.println(dataToSend[i/2]);
-            }
-
-
-            System.out.println("----------");
-
-
-            System.out.println("Connecting to " + goPro_IP + " on port " + port);
-            InetAddress addr = null;
-            try {
-                addr = InetAddress.getByName(goPro_IP);
-                if (addr.isReachable(1000))
-                    System.out.println("host is reachable");
-                else
-                    System.out.println("host is not reachable");
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            DatagramPacket out = new DatagramPacket(dataToSend, dataToSend.length, addr, 9);
-
-            DatagramSocket socket = null;
-            try {
-                socket = new DatagramSocket();
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
-            try {
-                socket.setSendBufferSize(dataToSend.length);
-                socket.send(out);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("finished async");
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-        }
-
-        @Override
-        protected void onPreExecute() {}
-
-        @Override
-        protected void onProgressUpdate(Void... values) {}
     }
 }
