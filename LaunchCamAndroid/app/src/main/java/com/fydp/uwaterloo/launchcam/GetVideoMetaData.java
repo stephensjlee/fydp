@@ -1,6 +1,7 @@
 package com.fydp.uwaterloo.launchcam;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,12 +34,11 @@ public class GetVideoMetaData extends AsyncTask<String, Void, Void> {
         try {
             u = new URL(params[0]);
             conn = (HttpURLConnection)u.openConnection();
-            System.out.println("test");
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
 
             if(conn.getResponseCode() != 200){
-                System.out.println("failed cuz request code: " + conn.getResponseCode());
+                Log.e("GetVideoMetaData", "failed cuz request code: "+conn.getResponseCode() );
             }
             BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
 
