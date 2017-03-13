@@ -80,7 +80,7 @@
             android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/aspect_ratio"
+        android:id="@+id/field_of_view"
         android:text="Wide"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

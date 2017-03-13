@@ -1,5 +1,6 @@
 package com.fydp.uwaterloo.launchcam.Fragments;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -21,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.fydp.uwaterloo.launchcam.AsyncTasks.ConnectRequest;
+import com.fydp.uwaterloo.launchcam.DeviceSettingActivity;
 import com.fydp.uwaterloo.launchcam.MainActivity;
 import com.fydp.uwaterloo.launchcam.Model.CameraModel;
 import com.fydp.uwaterloo.launchcam.Model.CameraStatusModel;
@@ -28,6 +30,7 @@ import com.fydp.uwaterloo.launchcam.R;
 import com.fydp.uwaterloo.launchcam.Service.CameraService;
 import com.fydp.uwaterloo.launchcam.Service.ServiceFactory;
 import com.fydp.uwaterloo.launchcam.Utility;
+import com.fydp.uwaterloo.launchcam.VideoActivity;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -45,6 +48,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static android.R.attr.mode;
 import static android.content.ContentValues.TAG;
 import static android.os.Looper.getMainLooper;
 
@@ -65,12 +69,10 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
     Runnable clockRunner = new Runnable() {
         @Override
         public void run() {
-//                Date currentTime = new Date();
             long millis = System.currentTimeMillis() - startTime;
             int seconds = (int) (millis / 1000);
             int minutes = seconds / 60;
             seconds     = seconds % 60;
-//                timerTv.setText(new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(new Date(currentTime.getTime() - startTime)));
             timerTv.setText(String.format("%d:%02d.%03d", minutes, seconds, millis%1000));
             clockHandler.postDelayed(this, 1);
         }
@@ -104,7 +106,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
 
         timerTv = (TextView) rootView.findViewById(R.id.timer);
 
-        // Timer
+        // Periodic Status Update
         service = ServiceFactory.createRetrofitService(CameraService.class, CameraService.SERVICE_ENDPOINT);
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -124,18 +126,13 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<CameraStatusModel>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
+                    public void onCompleted() {}
 
                     @Override
-                    public void onError(Throwable e) {
-
-                    }
+                    public void onError(Throwable e) {}
 
                     @Override
                     public void onNext(CameraStatusModel cameraStatusModel) {
-                        Log.d("getStatus",  ""+cameraStatusModel.getStatusModel().getBattery());
                         CameraStatusModel.StatusModel statusModel = cameraStatusModel.getStatusModel();
                         CameraStatusModel.SettingsModel settingsModel = cameraStatusModel.getSettingsModel();
                         // update battery percentage
@@ -164,12 +161,62 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                                 break;
                         }
 
-//                        switch (settingsModel.getVideoResolution()){
-//
-//                        }
                         // update video resolution and frame rate
-
+                        TextView resolution = (TextView) rootView.findViewById(R.id.resolution);
+                        String vidResolution = "";
+                        switch (settingsModel.getVideoResolution()){
+                            case 9:
+                                vidResolution = "1080";
+                                break;
+                            case 10:
+                                vidResolution = "960";
+                                break;
+                            case 12:
+                                vidResolution = "720";
+                                break;
+                            case 13:
+                                vidResolution = "WVGA";
+                                break;
+                            default:
+                                break;
+                        }
+                        // update video resolution and frame rate
+                        String frameRate = "";
+                        switch (settingsModel.getFrameRate()){
+                            case 0:
+                                frameRate = "240";
+                                break;
+                            case 1:
+                                frameRate = "120";
+                                break;
+                            case 5:
+                                frameRate = "60";
+                                break;
+                            case 8:
+                                frameRate = "30";
+                                break;
+                            default:
+                                break;
+                        }
+                        resolution.setText(String.format("%s-%sHz", vidResolution, frameRate));
                         // update field of view
+                        TextView fov = (TextView) rootView.findViewById(R.id.field_of_view);
+                        switch (settingsModel.getFieldOfView()){
+                            case 0:
+                                fov.setText("Wide");
+                                break;
+                            case 1:
+                                fov.setText("Medium");
+                                break;
+                            case 2:
+                                fov.setText("Narrow");
+                                break;
+                            case 4:
+                                fov.setText("Linear");
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 });
     }
@@ -180,18 +227,6 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
 
         switch (view.getId()) {
             case R.id.record_fab:
-//                Utility.toast("Record", getActivity());
-//                ImageView batteryIcon = (ImageView) rootView.findViewById(R.id.battery);
-//                if(batteryIcon.getTag().equals(R.drawable.battery_4)){
-//                    batteryIcon.setImageResource(0);
-//                    batteryIcon.setImageResource(R.drawable.battery_2);
-//                    batteryIcon.setTag(R.drawable.battery_2);
-//                } else{
-//                    batteryIcon.setImageResource(0);
-//                    batteryIcon.setImageResource(R.drawable.battery_4);
-//                    batteryIcon.setTag(R.drawable.battery_4);
-//                }
-
                 startTime = System.currentTimeMillis();
 
                 if(recordBtn.getTag().equals(VIDEO_MODE)){
@@ -208,21 +243,18 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                     // picture mode commands
                     triggerShutter();
                 }
-
-//                isRecording = !isRecording;
                 break;
             case R.id.options_btn:
-//                Utility.toast("Options", getActivity());
-                ImageView wifiIcon = (ImageView) rootView.findViewById(R.id.wifi);
-                if(wifiIcon.getTag().equals(R.drawable.wifi_full)){
-                    wifiIcon.setImageResource(0);
-                    wifiIcon.setImageResource(R.drawable.wifi_low);
-                    wifiIcon.setTag(R.drawable.wifi_low);
-                } else{
-                    wifiIcon.setImageResource(0);
-                    wifiIcon.setImageResource(R.drawable.wifi_full);
-                    wifiIcon.setTag(R.drawable.wifi_full);
-                }
+//                ImageView wifiIcon = (ImageView) rootView.findViewById(R.id.wifi);
+//                if(wifiIcon.getTag().equals(R.drawable.wifi_full)){
+//                    wifiIcon.setImageResource(0);
+//                    wifiIcon.setImageResource(R.drawable.wifi_low);
+//                    wifiIcon.setTag(R.drawable.wifi_low);
+//                } else{
+//                    wifiIcon.setImageResource(0);
+//                    wifiIcon.setImageResource(R.drawable.wifi_full);
+//                    wifiIcon.setTag(R.drawable.wifi_full);
+//                }
                 service.getStatus()
                         .subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -243,9 +275,11 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                             }
                         });
 
+                Intent myIntent = new Intent(getActivity(), DeviceSettingActivity.class);
+                getActivity().startActivity(myIntent);
+
                 break;
             case R.id.bluetooth_btn:
-//                Utility.toast("Bluetooth", getActivity());
                 new ConnectRequest().execute();
                 break;
             case R.id.mediaSwitch:
