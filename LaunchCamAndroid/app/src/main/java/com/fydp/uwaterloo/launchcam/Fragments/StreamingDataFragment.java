@@ -3,11 +3,14 @@ package com.fydp.uwaterloo.launchcam.Fragments;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 
 import com.androidplot.Plot;
 import com.androidplot.util.PlotStatistics;
@@ -19,26 +22,33 @@ import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYStepMode;
+import com.fydp.uwaterloo.launchcam.MainActivity;
 import com.fydp.uwaterloo.launchcam.R;
+import com.fydp.uwaterloo.launchcam.Utility;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Created by Said Afifi on 15-Jul-16.
  */
-public class StreamingDataFragment  extends Fragment {
-    private static final int HISTORY_SIZE = 300;            // number of points to plot in history
+public class StreamingDataFragment extends Fragment {
+    private static final int HISTORY_SIZE = 400;            // number of points to plot in history
 
     private XYPlot aprHistoryPlot = null;
-
-    private CheckBox hwAcceleratedCb;
-    private CheckBox showFpsCb;
 
     private SimpleXYSeries altitude;
     private SimpleXYSeries altitudeHistory = null;
 
     private Redrawer redrawer;
+    private ArrayList<Byte> packetToHandle;
+    private static final byte S = 83;
+    private static final byte P = 80;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -47,21 +57,44 @@ public class StreamingDataFragment  extends Fragment {
 
         altitude = new SimpleXYSeries("A");
 
-
         // setup the APR History plot:
         aprHistoryPlot = (XYPlot) rootView.findViewById(R.id.aprHistoryPlot);
+        Button getDataBtn = (Button) rootView.findViewById(R.id.btn_getData);
+        Button selectLaunchBtn = (Button) rootView.findViewById(R.id.btn_selectLaunch);
+        Button clearGraphBtn = (Button) rootView.findViewById(R.id.btn_clearGraph);
+        getDataBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String tmp = "D";
+                if(((MainActivity) getActivity()).connectedThread != null)
+                    ((MainActivity) getActivity()).connectedThread.write(tmp.getBytes());
+                else{
+                    Utility.toast("No Bluetooth Connection", getActivity());
+                }
+            }
+        });
+        clearGraphBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int size = altitudeHistory.size();
+                for (int i = 0; i < size; i++) {
+                    altitudeHistory.removeFirst();
+                }
+                aprHistoryPlot.clear();
+            }
+        });
 
         altitudeHistory = new SimpleXYSeries("Az.");
         altitudeHistory.useImplicitXVals();
 
-        aprHistoryPlot.setRangeBoundaries(-180, 359, BoundaryMode.FIXED);
-        aprHistoryPlot.setDomainBoundaries(0, HISTORY_SIZE, BoundaryMode.FIXED);
+        aprHistoryPlot.setRangeBoundaries(900, 1050, BoundaryMode.AUTO);
+        aprHistoryPlot.setDomainBoundaries(0, HISTORY_SIZE, BoundaryMode.AUTO);
         aprHistoryPlot.addSeries(altitudeHistory,
                 new LineAndPointFormatter(
                         Color.rgb(100, 100, 200), null, null, null));
 
         aprHistoryPlot.setDomainStepMode(XYStepMode.INCREMENT_BY_VAL);
-        aprHistoryPlot.setDomainStepValue(HISTORY_SIZE/10);
+        aprHistoryPlot.setDomainStepValue(HISTORY_SIZE / 10);
         aprHistoryPlot.setTicksPerRangeLabel(3);
         aprHistoryPlot.setDomainLabel("Sample Index");
         aprHistoryPlot.getDomainLabelWidget().pack();
@@ -71,43 +104,15 @@ public class StreamingDataFragment  extends Fragment {
         aprHistoryPlot.setRangeValueFormat(new DecimalFormat("#"));
         aprHistoryPlot.setDomainValueFormat(new DecimalFormat("#"));
 
-        // setup checkboxes:
-        hwAcceleratedCb = (CheckBox) rootView.findViewById(R.id.hwAccelerationCb);
-        final PlotStatistics levelStats = new PlotStatistics(1000, false);
         final PlotStatistics histStats = new PlotStatistics(1000, false);
 
         aprHistoryPlot.addListener(histStats);
 
-        showFpsCb = (CheckBox) rootView.findViewById(R.id.showFpsCb);
-        showFpsCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                levelStats.setAnnotatePlotEnabled(b);
-                histStats.setAnnotatePlotEnabled(b);
-            }
-        });
-
-
-        //TODO: replace with bluetooth data
-//        sensorMgr = (SensorManager) getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
-//        for (Sensor sensor : sensorMgr.getSensorList(Sensor.TYPE_ORIENTATION)) {
-//            if (sensor.getType() == Sensor.TYPE_ORIENTATION) {
-//                orSensor = sensor;
-//            }
-//        }
-
-        // if we can't access the orientation sensor then exit:
-//        if (orSensor == null) {
-//            System.out.println("Failed to attach to orSensor.");
-//            cleanup();
-//        }
-//
-//        sensorMgr.registerListener(this, orSensor, SensorManager.SENSOR_DELAY_UI);
-
+        packetToHandle = new ArrayList<>();
         redrawer = new Redrawer(
                 Arrays.asList(new Plot[]{aprHistoryPlot}),
                 100, false);
-                return rootView;
+        return rootView;
     }
 
     @Override
@@ -128,41 +133,73 @@ public class StreamingDataFragment  extends Fragment {
         super.onDestroy();
     }
 
-    private void cleanup() {
-        // aunregister with the orientation sensor before exiting:
-//        sensorMgr.unregisterListener(this);
-//        finish();
+    // Called whenever a new orSensor reading is taken.
+
+    public void handleBTData(byte[] readBuf) {
+        for (int i = 0; i < readBuf.length; i++) {
+            if (readBuf[i] == S) {
+                packetToHandle.clear();
+            } else if (readBuf[i] == P) {
+                processPacket();
+            } else {
+                packetToHandle.add(readBuf[i]);
+            }
+        }
     }
 
+    private void processPacket() {
+        try {
+            // get checksum value
+            byte[] checkSumBytes = {packetToHandle.get(packetToHandle.size() - 2),
+                    packetToHandle.get(packetToHandle.size() - 1)};
+            byte checksum = Byte.parseByte(new String(checkSumBytes), 16);
 
-    // Called whenever a new orSensor reading is taken.
-//    @Override
-//    public synchronized void onSensorChanged(SensorEvent sensorEvent) {
-//
-//        // update level data:
-//        altitude.setModel(Arrays.asList(
-//                new Number[]{sensorEvent.values[0]}),
-//                SimpleXYSeries.ArrayFormat.Y_VALS_ONLY);
-//
-//        pLvlSeries.setModel(Arrays.asList(
-//                new Number[]{sensorEvent.values[1]}),
-//                SimpleXYSeries.ArrayFormat.Y_VALS_ONLY);
-//
-//        rLvlSeries.setModel(Arrays.asList(
-//                new Number[]{sensorEvent.values[2]}),
-//                SimpleXYSeries.ArrayFormat.Y_VALS_ONLY);
-//
+            // calculate checksum
+            byte actualChecksum = 0;
+            for (int i = 0; i < packetToHandle.size() - 2; i++) {
+                actualChecksum = (byte)((actualChecksum & 0xFF) + (packetToHandle.get(i) & 0xFF));
+            }
+
+            // compare, then parse and render
+            if (checksum == actualChecksum) {
+                // parse
+                float value = parseData();
+                // use the data appropriately
+                draw(value);
+            }
+
+        } catch (Exception ignored) {
+
+        } finally {
+            // clear processed packet
+            packetToHandle.clear();
+        }
+    }
+
+    private float parseData() throws Exception {
+
+        List<Byte> msgBytes = packetToHandle.subList(0, packetToHandle.size() - 2);
+        byte[] msgBytesPrimitive = new byte[msgBytes.size()];
+        for (int i = 0; i < msgBytes.size(); i++) {
+            msgBytesPrimitive[i] = msgBytes.get(i);
+        }
+        String string = new String(msgBytesPrimitive);
+        return Float.parseFloat(string);
+    }
+
+    public void draw(float value) {
+//        Log.d("data", ""+value);
 //        // get rid the oldest sample in history:
-//        if (rollHistorySeries.size() > HISTORY_SIZE) {
-//            rollHistorySeries.removeFirst();
-//            pitchHistorySeries.removeFirst();
+//        if (altitudeHistory.size() > HISTORY_SIZE) {
 //            altitudeHistory.removeFirst();
 //        }
 //
 //        // add the latest history sample:
-//        altitudeHistory.addLast(null, sensorEvent.values[0]);
-//        pitchHistorySeries.addLast(null, sensorEvent.values[1]);
-//        rollHistorySeries.addLast(null, sensorEvent.values[2]);
-//    }
+//        altitudeHistory.addLast(null, value);
+//
+//        // update level data:
+//        altitude.setModel(Arrays.asList(value), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY);
+////        tv.setText(String.valueOf(value));
+    }
 
 }

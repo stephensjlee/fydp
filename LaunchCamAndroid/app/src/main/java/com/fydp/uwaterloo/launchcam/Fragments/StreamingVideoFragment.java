@@ -41,7 +41,6 @@ public class StreamingVideoFragment extends Fragment implements AsyncResponse{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
         new GetVideoMetaData(this).execute("http://10.5.5.9:8080/gp/gpMediaList");
 
         View rootView = inflater.inflate(R.layout.video_list_layout, container, false);

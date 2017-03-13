@@ -9,6 +9,7 @@ import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -26,6 +27,7 @@ import android.widget.Toast;
 import com.fydp.uwaterloo.launchcam.Adapters.AppPagerAdapter;
 import com.fydp.uwaterloo.launchcam.Bluetooth.ConnectThread;
 import com.fydp.uwaterloo.launchcam.Bluetooth.ConnectedThread;
+import com.fydp.uwaterloo.launchcam.Fragments.StreamingDataFragment;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -101,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                Log.i(Utility.tag, "in handler");
                 super.handleMessage(msg);
                 switch (msg.what) {
                     case Utility.SUCCESS_CONNECT:
@@ -113,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case Utility.MESSAGE_READ:
                         byte[] readBuf = (byte[]) msg.obj;
-                        String string = new String(readBuf);
-                        Toast.makeText(getApplicationContext(), string, Toast.LENGTH_SHORT).show();
+                        Log.d("data", new String(readBuf));
+                        ((StreamingDataFragment)mAppPagerAdapter.getRegisteredFragment(1)).handleBTData(readBuf);
                         break;
                 }
             }
