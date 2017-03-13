@@ -9,19 +9,15 @@ import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.text.method.CharacterPickerDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.fydp.uwaterloo.launchcam.Adapters.AppPagerAdapter;
@@ -29,7 +25,6 @@ import com.fydp.uwaterloo.launchcam.Bluetooth.ConnectThread;
 import com.fydp.uwaterloo.launchcam.Bluetooth.ConnectedThread;
 import com.fydp.uwaterloo.launchcam.Fragments.StreamingDataFragment;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -77,10 +72,12 @@ public class MainActivity extends AppCompatActivity {
                 if (mBluetoothAdapter.isDiscovering()) {
                     mBluetoothAdapter.cancelDiscovery();
                 }
-                ConnectThread connect = new ConnectThread(capsuleBluetoothDevice, mBluetoothAdapter, mHandler);
-                connect.start();
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if (capsuleBluetoothDevice != null){
+                    ConnectThread connect = new ConnectThread(capsuleBluetoothDevice, mBluetoothAdapter, mHandler);
+                    connect.start();
+                }else{
+                    Utility.toast("Please pair bluetooth device first", getApplicationContext());
+                }
             }
         });
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -115,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                     case Utility.MESSAGE_READ:
                         String readBuf = (String) msg.obj;
                         Log.d("TEST", "handleMessage: "+readBuf);
-                        ((StreamingDataFragment)mAppPagerAdapter.getRegisteredFragment(1)).handleBTData(readBuf);
+                        ((StreamingDataFragment)mAppPagerAdapter.getRegisteredFragment(1)).handleDataToDraw(readBuf);
                         break;
                 }
             }
