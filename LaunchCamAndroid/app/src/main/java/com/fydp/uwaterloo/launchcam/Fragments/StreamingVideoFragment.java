@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ListView;
 
 import com.fydp.uwaterloo.launchcam.AsyncResponse;
@@ -15,6 +16,7 @@ import com.fydp.uwaterloo.launchcam.CustomListAdapter;
 import com.fydp.uwaterloo.launchcam.GetVideoMetaData;
 import com.fydp.uwaterloo.launchcam.ImageActivity;
 import com.fydp.uwaterloo.launchcam.R;
+import com.fydp.uwaterloo.launchcam.SampleGridViewAdapter;
 import com.fydp.uwaterloo.launchcam.VideoActivity;
 
 import java.util.ArrayList;
@@ -25,7 +27,8 @@ import java.util.List;
  */
 public class StreamingVideoFragment extends Fragment implements AsyncResponse{
     List<String> output = new ArrayList<>();
-    CustomListAdapter adapter;
+//    CustomListAdapter adapter;
+    SampleGridViewAdapter adapter;
 
 
     @Override
@@ -46,8 +49,8 @@ public class StreamingVideoFragment extends Fragment implements AsyncResponse{
         new GetVideoMetaData(this).execute("http://10.5.5.9:8080/gp/gpMediaList");
 
         View rootView = inflater.inflate(R.layout.video_list_layout, container, false);
-        final ListView listview = (ListView) rootView.findViewById(R.id.listview);
-        adapter = new CustomListAdapter(getActivity(), output);
+        final GridView listview = (GridView) rootView.findViewById(R.id.grid_view);
+        adapter = new SampleGridViewAdapter(getActivity(), output);
         listview.setAdapter(adapter);
 
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {

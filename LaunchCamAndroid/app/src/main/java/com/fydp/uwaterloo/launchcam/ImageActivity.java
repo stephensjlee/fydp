@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.VideoView;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.InputStream;
 
 /**
@@ -16,7 +18,7 @@ import java.io.InputStream;
 
 public class ImageActivity extends AppCompatActivity {
     String url = "";
-
+    ImageView view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,14 +27,15 @@ public class ImageActivity extends AppCompatActivity {
         url = intent.getStringExtra("url");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_view);
-
-//        SubsamplingScaleImageView imageView = (SubsamplingScaleImageView)findViewById(R.id.imageView);
-//        imageView.setImage(ImageSource.resource(R.drawable.wifi_low));
-//        imageView.setZoomEnabled(true);
-
-        new DownloadImageTask((ImageView) findViewById(R.id.imageView))
-                .execute(url);
+        view = (ImageView)findViewById(R.id.imageView);
 
 
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Picasso.with(this).load(url).into(view);
     }
 }
