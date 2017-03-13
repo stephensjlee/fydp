@@ -38,6 +38,7 @@ import java.util.StringTokenizer;
  */
 public class StreamingDataFragment extends Fragment {
     private static final int HISTORY_SIZE = 400;            // number of points to plot in history
+    private static final String BLUETOOTH_STR_LOG = "l";
 
     private XYPlot aprHistoryPlot = null;
 
@@ -45,9 +46,6 @@ public class StreamingDataFragment extends Fragment {
     private SimpleXYSeries altitudeHistory = null;
 
     private Redrawer redrawer;
-    private ArrayList<Byte> packetToHandle;
-    private static final byte S = 83;
-    private static final byte P = 80;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,9 +61,10 @@ public class StreamingDataFragment extends Fragment {
         Button selectLaunchBtn = (Button) rootView.findViewById(R.id.btn_selectLaunch);
         Button clearGraphBtn = (Button) rootView.findViewById(R.id.btn_clearGraph);
         getDataBtn.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                String tmp = "D";
+                String tmp = BLUETOOTH_STR_LOG;
                 if(((MainActivity) getActivity()).connectedThread != null)
                     ((MainActivity) getActivity()).connectedThread.write(tmp.getBytes());
                 else{
@@ -108,7 +107,6 @@ public class StreamingDataFragment extends Fragment {
 
         aprHistoryPlot.addListener(histStats);
 
-        packetToHandle = new ArrayList<>();
         redrawer = new Redrawer(
                 Arrays.asList(new Plot[]{aprHistoryPlot}),
                 100, false);
@@ -135,71 +133,28 @@ public class StreamingDataFragment extends Fragment {
 
     // Called whenever a new orSensor reading is taken.
 
-    public void handleBTData(byte[] readBuf) {
-        for (int i = 0; i < readBuf.length; i++) {
-            if (readBuf[i] == S) {
-                packetToHandle.clear();
-            } else if (readBuf[i] == P) {
-                processPacket();
-            } else {
-                packetToHandle.add(readBuf[i]);
-            }
-        }
+    public void handleBTData(String readBuf) {
+        float value = parseData(readBuf);
+        // use the data appropriately
+        draw(value);
     }
 
-    private void processPacket() {
-        try {
-            // get checksum value
-            byte[] checkSumBytes = {packetToHandle.get(packetToHandle.size() - 2),
-                    packetToHandle.get(packetToHandle.size() - 1)};
-            byte checksum = Byte.parseByte(new String(checkSumBytes), 16);
-
-            // calculate checksum
-            byte actualChecksum = 0;
-            for (int i = 0; i < packetToHandle.size() - 2; i++) {
-                actualChecksum = (byte)((actualChecksum & 0xFF) + (packetToHandle.get(i) & 0xFF));
-            }
-
-            // compare, then parse and render
-            if (checksum == actualChecksum) {
-                // parse
-                float value = parseData();
-                // use the data appropriately
-                draw(value);
-            }
-
-        } catch (Exception ignored) {
-
-        } finally {
-            // clear processed packet
-            packetToHandle.clear();
-        }
-    }
-
-    private float parseData() throws Exception {
-
-        List<Byte> msgBytes = packetToHandle.subList(0, packetToHandle.size() - 2);
-        byte[] msgBytesPrimitive = new byte[msgBytes.size()];
-        for (int i = 0; i < msgBytes.size(); i++) {
-            msgBytesPrimitive[i] = msgBytes.get(i);
-        }
-        String string = new String(msgBytesPrimitive);
-        return Float.parseFloat(string);
+    private float parseData(String readBuf) {
+        String[] split = readBuf.split(",");
+        return Float.parseFloat(split[0]);
     }
 
     public void draw(float value) {
-//        Log.d("data", ""+value);
-//        // get rid the oldest sample in history:
-//        if (altitudeHistory.size() > HISTORY_SIZE) {
-//            altitudeHistory.removeFirst();
-//        }
-//
-//        // add the latest history sample:
-//        altitudeHistory.addLast(null, value);
-//
-//        // update level data:
-//        altitude.setModel(Arrays.asList(value), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY);
-////        tv.setText(String.valueOf(value));
+        // get rid the oldest sample in history:
+        if (altitudeHistory.size() > HISTORY_SIZE) {
+            altitudeHistory.removeFirst();
+        }
+
+        // add the latest history sample:
+        altitudeHistory.addLast(null, value);
+
+        // update level data:
+        altitude.setModel(Arrays.asList(value), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY);
     }
 
 }

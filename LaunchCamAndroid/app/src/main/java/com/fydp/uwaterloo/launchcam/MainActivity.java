@@ -113,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
                         Log.i(Utility.tag, "connected");
                         break;
                     case Utility.MESSAGE_READ:
-                        byte[] readBuf = (byte[]) msg.obj;
-                        Log.d("data", new String(readBuf));
+                        String readBuf = (String) msg.obj;
+                        Log.d("TEST", "handleMessage: "+readBuf);
                         ((StreamingDataFragment)mAppPagerAdapter.getRegisteredFragment(1)).handleBTData(readBuf);
                         break;
                 }

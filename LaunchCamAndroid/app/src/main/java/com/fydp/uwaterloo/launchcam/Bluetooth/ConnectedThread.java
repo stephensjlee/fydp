@@ -37,21 +37,31 @@ public class ConnectedThread extends Thread {
     }
 
     public void run() {
-        byte[] buffer = new byte[2015];  // buffer store for the stream
+        byte[] buffer = new byte[1024];  // buffer store for the stream
         int bytes; // bytes returned from read()
+
+        StringBuilder readMessage = new StringBuilder();
 
         // Keep listening to the InputStream until an exception occurs
         while (true) {
             try {
-                // Read from the InputStream
                 bytes = mmInStream.read(buffer);
+                String read = new String(buffer, 0, bytes);
+                readMessage.append(read);
 
-                // Send the obtained bytes to the UI activity
-                Log.d("ConnectThread", "bytesRead: " + bytes + " , " +  buffer.length);
+                if (read.contains("\n")) {
+                    String msg = readMessage.toString();
+                    String[] split = msg.split("\n");
+                    mHandler.obtainMessage(Utility.MESSAGE_READ, -1, -1, split[0])
+                            .sendToTarget();
+                    readMessage.setLength(0);
+                    if ( split.length > 1 ){
+                        readMessage.append(split[1]);
+                    }
+                }
 
-                mHandler.obtainMessage(Utility.MESSAGE_READ, bytes, -1, buffer)
-                        .sendToTarget();
             } catch (IOException e) {
+                Log.e(this.getName(), "Connection Lost", e);
                 break;
             }
         }
