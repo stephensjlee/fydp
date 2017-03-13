@@ -32,8 +32,6 @@ import com.fydp.uwaterloo.launchcam.Fragments.StreamingDataFragment;
 import java.util.ArrayList;
 import java.util.Set;
 
-import io.vov.vitamio.LibsChecker;
-
 public class MainActivity extends AppCompatActivity {
 
     /**
@@ -56,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (!LibsChecker.checkVitamioLibs(this))
-            return;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
