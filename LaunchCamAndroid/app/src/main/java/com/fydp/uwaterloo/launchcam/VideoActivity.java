@@ -23,7 +23,6 @@ import java.nio.charset.Charset;
 
 public class VideoActivity extends AppCompatActivity {
     String url = "";
-    private Handler handler = new Handler();
     private static VideoView videoView;
 
 

@@ -27,5 +27,6 @@ dependencies {
     compile 'io.reactivex:rxjava:1.0.+'
     compile 'io.reactivex:rxandroid:0.23.+'
     compile 'com.squareup.retrofit:retrofit:1.9.+'
+
     compile group: 'com.androidplot', name: 'androidplot-core', version: '0.6.1'
 }

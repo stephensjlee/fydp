@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import com.fydp.uwaterloo.launchcam.AsyncResponse;
 import com.fydp.uwaterloo.launchcam.GetVideoMetaData;
+import com.fydp.uwaterloo.launchcam.ImageActivity;
 import com.fydp.uwaterloo.launchcam.R;
 import com.fydp.uwaterloo.launchcam.VideoActivity;
 
@@ -56,11 +57,19 @@ public class StreamingVideoFragment extends Fragment implements AsyncResponse{
             public void onItemClick(AdapterView<?> parent, final View view,
                                     int position, long id) {
                 final String item = (String) parent.getItemAtPosition(position);
-                Intent myIntent = new Intent(getActivity(), VideoActivity.class);
+
                 System.out.println(item);
-                String url = "http://10.5.5.9:8080/videos/DCIM/112GOPRO/" + item;
-                myIntent.putExtra("url", url);
-                getActivity().startActivity(myIntent);
+                if(item.contains("JPG")){
+                    Intent myIntent = new Intent(getActivity(), ImageActivity.class);
+                    String url = "http://10.5.5.9:8080/videos/DCIM/112GOPRO/" + item;
+                    myIntent.putExtra("url", url);
+                    getActivity().startActivity(myIntent);
+                }else if(item.contains("LRV")){
+                    Intent myIntent = new Intent(getActivity(), VideoActivity.class);
+                    String url = "http://10.5.5.9:8080/videos/DCIM/112GOPRO/" + item;
+                    myIntent.putExtra("url", url);
+                    getActivity().startActivity(myIntent);
+                }
             }
 
         });
