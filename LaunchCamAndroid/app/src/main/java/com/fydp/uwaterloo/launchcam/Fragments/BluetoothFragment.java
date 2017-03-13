@@ -58,13 +58,20 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
     CameraService service;
     private final String VIDEO_MODE = "videoMode";
     private final String PICTURE_MODE = "pictureMode";
+    long startTime;
 
     TextView timerTv;
     Handler clockHandler;
     Runnable clockRunner = new Runnable() {
         @Override
         public void run() {
-            timerTv.setText(new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(new Date()));
+//                Date currentTime = new Date();
+            long millis = System.currentTimeMillis() - startTime;
+            int seconds = (int) (millis / 1000);
+            int minutes = seconds / 60;
+            seconds     = seconds % 60;
+//                timerTv.setText(new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(new Date(currentTime.getTime() - startTime)));
+            timerTv.setText(String.format("%d:%02d.%03d", minutes, seconds, millis%1000));
             clockHandler.postDelayed(this, 1);
         }
     };
@@ -95,27 +102,9 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         Button camVidSwitch = (Button) rootView.findViewById(R.id.mediaSwitch);
         camVidSwitch.setOnClickListener(this);
 
-        //
         timerTv = (TextView) rootView.findViewById(R.id.timer);
 
-//        final EditText editText = (EditText) rootView.findViewById(R.id.msg_bt_et);
-//        Button sendBtn = (Button) rootView.findViewById(R.id.send_btn);
-//        sendBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String tmp = "*"+editText.getText().toString();
-//                if(((MainActivity) getActivity()).connectedThread != null)
-//                    ((MainActivity) getActivity()).connectedThread.write(tmp.getBytes());
-//                else{
-//                    Utility.toast("No Bluetooth Connection", getActivity());
-//                }
-//            }
-//        });
-//        FloatingActionButton bluetoothBtn = (FloatingActionButton) rootView.findViewById(R.id.bluetooth_fab);
-//        bluetoothBtn.setColorFilter(Color.BLACK);
-
-//        ImageView bluetoothBtn = (ImageView) rootView.findViewById(R.id.bluetooth_btn);
-//        redCircle.getDrawable().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY );
+        // Timer
         service = ServiceFactory.createRetrofitService(CameraService.class, CameraService.SERVICE_ENDPOINT);
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -123,12 +112,66 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                 updateStatus();
             }
         }, 2000, 5000);
+
         clockHandler = new Handler(getMainLooper());
         return rootView;
     }
 
     private void updateStatus() {
         Log.d("updateStatus", "updateStatus: ");
+        service.getStatus()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<CameraStatusModel>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(CameraStatusModel cameraStatusModel) {
+                        Log.d("getStatus",  ""+cameraStatusModel.getStatusModel().getBattery());
+                        CameraStatusModel.StatusModel statusModel = cameraStatusModel.getStatusModel();
+                        CameraStatusModel.SettingsModel settingsModel = cameraStatusModel.getSettingsModel();
+                        // update battery percentage
+                        ImageView batteryIcon = (ImageView) rootView.findViewById(R.id.battery);
+                        switch (statusModel.getBattery()){
+                            case 3:
+                                // full
+                                batteryIcon.setImageResource(0);
+                                batteryIcon.setImageResource(R.drawable.battery_4);
+                                break;
+                            case 2:
+                                // halfway
+                                batteryIcon.setImageResource(0);
+                                batteryIcon.setImageResource(R.drawable.battery_3);
+                                break;
+                            case 1:
+                                // low
+                                batteryIcon.setImageResource(0);
+                                batteryIcon.setImageResource(R.drawable.battery_2);
+                                break;
+                            case 4:
+                                // charging
+                                // need to find a pic
+                                break;
+                            default:
+                                break;
+                        }
+
+//                        switch (settingsModel.getVideoResolution()){
+//
+//                        }
+                        // update video resolution and frame rate
+
+                        // update field of view
+                    }
+                });
     }
 
     @Override
@@ -138,28 +181,28 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         switch (view.getId()) {
             case R.id.record_fab:
 //                Utility.toast("Record", getActivity());
-                ImageView batteryIcon = (ImageView) rootView.findViewById(R.id.battery);
-                if(batteryIcon.getTag().equals(R.drawable.battery_4)){
-                    batteryIcon.setImageResource(0);
-                    batteryIcon.setImageResource(R.drawable.battery_2);
-                    batteryIcon.setTag(R.drawable.battery_2);
-                } else{
-                    batteryIcon.setImageResource(0);
-                    batteryIcon.setImageResource(R.drawable.battery_4);
-                    batteryIcon.setTag(R.drawable.battery_4);
-                }
+//                ImageView batteryIcon = (ImageView) rootView.findViewById(R.id.battery);
+//                if(batteryIcon.getTag().equals(R.drawable.battery_4)){
+//                    batteryIcon.setImageResource(0);
+//                    batteryIcon.setImageResource(R.drawable.battery_2);
+//                    batteryIcon.setTag(R.drawable.battery_2);
+//                } else{
+//                    batteryIcon.setImageResource(0);
+//                    batteryIcon.setImageResource(R.drawable.battery_4);
+//                    batteryIcon.setTag(R.drawable.battery_4);
+//                }
 
-
-
-                clockHandler.postDelayed(clockRunner, 10);
+                startTime = System.currentTimeMillis();
 
                 if(recordBtn.getTag().equals(VIDEO_MODE)){
                     if(!isRecording){
                         // send command to record
                         triggerShutter();
+                        clockHandler.postDelayed(clockRunner, 10);
                     } else{
                         // send command to stop recording
                         stopRecording();
+                        clockHandler.removeCallbacks(clockRunner);
                     }
                 } else{
                     // picture mode commands

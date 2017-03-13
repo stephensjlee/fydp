@@ -1,6 +1,5 @@
 package com.fydp.uwaterloo.launchcam.Fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,7 +17,6 @@ import com.fydp.uwaterloo.launchcam.R;
 import com.fydp.uwaterloo.launchcam.VideoActivity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
