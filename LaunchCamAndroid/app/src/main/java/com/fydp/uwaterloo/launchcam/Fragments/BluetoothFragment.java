@@ -22,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.fydp.uwaterloo.launchcam.AsyncTasks.ConnectRequest;
-import com.fydp.uwaterloo.launchcam.DeviceSettingActivity;
 import com.fydp.uwaterloo.launchcam.MainActivity;
 import com.fydp.uwaterloo.launchcam.Model.CameraModel;
 import com.fydp.uwaterloo.launchcam.Model.CameraStatusModel;
@@ -274,9 +273,6 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                                 Log.d("getStatus",  ""+cameraStatusModel.getStatusModel().getBattery() );
                             }
                         });
-
-                Intent myIntent = new Intent(getActivity(), DeviceSettingActivity.class);
-                getActivity().startActivity(myIntent);
 
                 break;
             case R.id.bluetooth_btn:
