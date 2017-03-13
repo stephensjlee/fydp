@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -59,6 +61,7 @@ public class StreamingDataFragment extends Fragment {
     private ArrayAdapter<String> fileListAdapter;
     private ArrayList<String> fileNames;
     private XYPlot aprHistoryPlot = null;
+    private EditText graphToDraw;
 
     private SimpleXYSeries altitude;
     private SimpleXYSeries altitudeHistory = null;
@@ -78,6 +81,7 @@ public class StreamingDataFragment extends Fragment {
         Button getDataBtn = (Button) rootView.findViewById(R.id.btn_getData);
         Button storeBtn = (Button) rootView.findViewById(R.id.btn_store);
         Button clearGraphBtn = (Button) rootView.findViewById(R.id.btn_clearGraph);
+        graphToDraw = (EditText) rootView.findViewById(R.id.et_graphToDraw);
         ListView fileList = (ListView) rootView.findViewById(R.id.lv_fileList);
         currentData = new ArrayList<>();
         loadFileNames();
@@ -164,22 +168,32 @@ public class StreamingDataFragment extends Fragment {
         currentData.clear();
     }
 
-    private void fileClick(String fileName) {
+    private void fileClick(final String fileName) {
         clearData();
-        File path = getActivity().getExternalFilesDir(null);
-        File file = new File(path, fileName);
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = br.readLine()) != null) {
-                handleDataToDraw(line);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File path = getActivity().getExternalFilesDir(null);
+                File file = new File(path, fileName);
+                try {
+                    BufferedReader br = new BufferedReader(new FileReader(file));
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        SystemClock.sleep(10);
+                        final String finalLine = line;
+                        getActivity().runOnUiThread(new Runnable() {
+                            public void run() {
+                                handleDataToDraw(finalLine);
+                            }
+                        });
+                    }
+                    br.close();
+                }
+                catch (IOException e) {
+                    Log.e("StreamingData", "Read File: ", e);
+                }
             }
-            br.close();
-        }
-        catch (IOException e) {
-            Log.e("StreamingData", "Read File: ", e);
-        }
-
+        }).start();
     }
 
     private void fileLongPress(TextView view, int position) {
@@ -265,14 +279,15 @@ public class StreamingDataFragment extends Fragment {
 
     public void handleDataToDraw(String readBuf) {
         currentData.add(readBuf);
-        float value = parseData(readBuf);
+        int graphNum = Integer.parseInt(graphToDraw.getText().toString());
+        float value = parseData(readBuf,graphNum);
         // use the data appropriately
         draw(value);
     }
 
-    private float parseData(String readBuf) {
+    private float parseData(String readBuf, int graphNum) {
         String[] split = readBuf.split(",");
-        return Float.parseFloat(split[3]);
+        return Float.parseFloat(split[graphNum]);
     }
 
     public void draw(float value) {
