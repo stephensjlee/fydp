@@ -8,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.VideoView;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+
 import java.io.InputStream;
 
 /**
@@ -25,6 +28,10 @@ public class ImageActivity extends AppCompatActivity {
         url = intent.getStringExtra("url");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_view);
+
+//        SubsamplingScaleImageView imageView = (SubsamplingScaleImageView)findViewById(R.id.imageView);
+//        imageView.setImage(ImageSource.resource(R.drawable.wifi_low));
+//        imageView.setZoomEnabled(true);
 
         new DownloadImageTask((ImageView) findViewById(R.id.imageView))
                 .execute(url);
