@@ -69,13 +69,16 @@ public class GetVideoMetaData extends AsyncTask<String, Void, Void> {
                 JSONObject row = jsonArray.getJSONObject(i);
                 if("112GOPRO".equals(row.getString("d"))){
                     JSONArray fsArray = row.getJSONArray("fs");
-                    for(int j = 0; j < fsArray.length(); j++){
+                    for(int j = fsArray.length() - 1; j >= 0; j--){
+                        if(videoFileNames.size() >= 20){
+                            break;
+                        }
                         JSONObject o = fsArray.getJSONObject(j);
                         if(o.getString("n").contains("MP4")){
                             videoFileNames.add(o.getString("n").replace("MP4", "LRV"));
                         }
                         if(o.getString("n").contains("JPG")){
-                            pictureFileNames.add(o.getString("n"));
+                            videoFileNames.add(o.getString("n"));
                         }
                     }
                 }
