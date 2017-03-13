@@ -2,6 +2,7 @@ package com.fydp.uwaterloo.launchcam;
 
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +16,12 @@ import java.util.List;
 public class CustomListAdapter extends BaseAdapter {
     private List listData;
     private LayoutInflater layoutInflater;
+    private Context context;
 
     public CustomListAdapter(Context context, List listData) {
         this.listData = listData;
         layoutInflater = LayoutInflater.from(context);
+        this.context = context;
     }
 
     @Override
@@ -55,6 +58,8 @@ public class CustomListAdapter extends BaseAdapter {
             if(string.contains("LRV")){
                 new DownloadImageTask(holder.imageView)
                         .execute("http://10.5.5.9:8080/videos/DCIM/112GOPRO/" + string.replace("LRV", "THM"));
+            }else{
+                holder.imageView = null;
             }
         }
         return convertView;
