@@ -1,6 +1,7 @@
 package com.fydp.uwaterloo.launchcam;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,12 +34,11 @@ public class GetVideoMetaData extends AsyncTask<String, Void, Void> {
         try {
             u = new URL(params[0]);
             conn = (HttpURLConnection)u.openConnection();
-            System.out.println("test");
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
 
             if(conn.getResponseCode() != 200){
-                System.out.println("failed cuz request code: " + conn.getResponseCode());
+                Log.e("GetVideoMetaData", "failed cuz request code: "+conn.getResponseCode() );
             }
             BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
 
@@ -69,13 +69,16 @@ public class GetVideoMetaData extends AsyncTask<String, Void, Void> {
                 JSONObject row = jsonArray.getJSONObject(i);
                 if("112GOPRO".equals(row.getString("d"))){
                     JSONArray fsArray = row.getJSONArray("fs");
-                    for(int j = 0; j < fsArray.length(); j++){
+                    for(int j = fsArray.length() - 1; j >= 0; j--){
+                        if(videoFileNames.size() >= 20){
+                            break;
+                        }
                         JSONObject o = fsArray.getJSONObject(j);
                         if(o.getString("n").contains("MP4")){
                             videoFileNames.add(o.getString("n").replace("MP4", "LRV"));
                         }
                         if(o.getString("n").contains("JPG")){
-                            pictureFileNames.add(o.getString("n"));
+                            videoFileNames.add(o.getString("n"));
                         }
                     }
                 }

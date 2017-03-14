@@ -32,9 +32,8 @@ public class ConnectThread extends Thread {
         try {
             // MY_UUID is the app's UUID string, also used by the server code
             tmp = device.createRfcommSocketToServiceRecord(Utility.MY_UUID);
-        } catch (IOException e) {
-            Log.i(tag, "get socket failed");
-
+        } catch (Exception e) {
+            Log.e(tag, "get socket failed");
         }
         mmSocket = tmp;
     }
@@ -64,5 +63,9 @@ public class ConnectThread extends Thread {
         try {
             mmSocket.close();
         } catch (IOException e) { }
+    }
+
+    public boolean isAvaliable() {
+        return mmSocket != null;
     }
 }

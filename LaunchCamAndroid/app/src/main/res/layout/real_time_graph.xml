@@ -3,7 +3,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
-
     <com.androidplot.xy.XYPlot
         android:id="@+id/aprHistoryPlot"
         androidPlot.backgroundPaint.color="#000000"
@@ -47,10 +46,10 @@
             android:text="@string/get_data"
             android:layout_weight="1"/>
         <Button
-            android:id="@+id/btn_selectLaunch"
+            android:id="@+id/btn_store"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/select_launch"
+            android:text="@string/store_data"
             android:layout_weight="1"/>
         <Button
             android:id="@+id/btn_clearGraph"
@@ -58,6 +57,20 @@
             android:layout_height="wrap_content"
             android:text="@string/clear_graph"
             android:layout_weight="1"/>
+        <EditText
+            android:id="@+id/et_graphToDraw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:layout_weight="1"/>
     </LinearLayout>
+
+    <ListView
+        android:id="@+id/lv_fileList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:isScrollContainer="false"
+        />
+
 
 </LinearLayout>

@@ -51,6 +51,7 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import retrofit.http.HEAD;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -266,24 +267,8 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener,
                 }
                 break;
             case R.id.options_btn:
-//                service.getStatus()
-//                        .subscribeOn(Schedulers.newThread())
-//                        .observeOn(AndroidSchedulers.mainThread())
-//                        .subscribe(new Subscriber<CameraStatusModel>() {
-//                            @Override
-//                            public void onCompleted() {}
-//
-//                            @Override
-//                            public void onError(Throwable e) {}
-//
-//                            @Override
-//                            public void onNext(CameraStatusModel cameraStatusModel) {
-//                                Log.d("getStatus",  ""+cameraStatusModel.getStatusModel().getBattery() );
-//                            }
-//                        });
                 Intent myIntent = new Intent(getActivity(), DeviceSettingActivity.class);
                 getActivity().startActivity(myIntent);
-
                 break;
             case R.id.bluetooth_btn:
                 new ConnectRequest().execute();
