@@ -161,4 +161,12 @@
             android:layout_centerVertical="true" />
 
     </RelativeLayout>
+
+    <Spinner
+        android:id="@+id/spinnerTest"
+        android:layout_width="167dp"
+        android:layout_height="wrap_content"
+        android:entries="@array/res_arrays"
+        android:prompt="@string/resolution"
+        android:layout_weight="0.14" />
 </LinearLayout>

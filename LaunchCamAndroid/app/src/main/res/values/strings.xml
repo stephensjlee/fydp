@@ -5,4 +5,28 @@
     <string name="get_data">Get Data</string>
     <string name="select_launch">Select Launch</string>
     <string name="clear_graph">Clear Graph</string>
+    <string name="resolution">Resolution</string>
+    <string name="frameRate">Frame Rate</string>
+    <string name="fov">Field of View</string>
+
+    <string-array name="res_arrays">
+        <item>1080</item>
+        <item>960</item>
+        <item>720</item>
+        <item>WVGA</item>
+    </string-array>
+
+    <string-array name="frameRate_arrays">
+        <item>240</item>
+        <item>120</item>
+        <item>60</item>
+        <item>30</item>
+    </string-array>
+
+    <string-array name="fov_arrays">
+        <item>Wide</item>
+        <item>Medium</item>
+        <item>Narrow</item>
+        <item>Linear</item>
+    </string-array>
 </resources>

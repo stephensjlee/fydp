@@ -15,14 +15,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fydp.uwaterloo.launchcam.AsyncTasks.ConnectRequest;
 import com.fydp.uwaterloo.launchcam.DeviceSettingActivity;
+import com.fydp.uwaterloo.launchcam.ImageActivity;
 import com.fydp.uwaterloo.launchcam.MainActivity;
 import com.fydp.uwaterloo.launchcam.Model.CameraModel;
 import com.fydp.uwaterloo.launchcam.Model.CameraStatusModel;
@@ -39,7 +44,9 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -55,7 +62,7 @@ import static android.os.Looper.getMainLooper;
 /**
  * Created by Said Afifi on 15-Jul-16.
  */
-public class BluetoothFragment extends Fragment implements View.OnClickListener{
+public class BluetoothFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener{
 
     View rootView = null;
     private boolean isRecording = false;
@@ -116,11 +123,25 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         }, 2000, 5000);
 
         clockHandler = new Handler(getMainLooper());
+
+
+//        Spinner spinner2 = (Spinner) rootView.findViewById(R.id.spinnerTest);
+//        List<String> list = new ArrayList<String>();
+//        list.add("list 1");
+//        list.add("list 2");
+//        list.add("list 3");
+//        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
+//                android.R.layout.simple_spinner_dropdown_item, list);
+//        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        spinner2.setAdapter(dataAdapter);
+
+        Spinner spinner1 = (Spinner) rootView.findViewById(R.id.spinnerTest);
+        spinner1.setOnItemSelectedListener(this);
+
         return rootView;
     }
 
     private void updateStatus() {
-        Log.d("updateStatus", "updateStatus: ");
         service.getStatus()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -245,36 +266,21 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                 }
                 break;
             case R.id.options_btn:
-//                ImageView wifiIcon = (ImageView) rootView.findViewById(R.id.wifi);
-//                if(wifiIcon.getTag().equals(R.drawable.wifi_full)){
-//                    wifiIcon.setImageResource(0);
-//                    wifiIcon.setImageResource(R.drawable.wifi_low);
-//                    wifiIcon.setTag(R.drawable.wifi_low);
-//                } else{
-//                    wifiIcon.setImageResource(0);
-//                    wifiIcon.setImageResource(R.drawable.wifi_full);
-//                    wifiIcon.setTag(R.drawable.wifi_full);
-//                }
-                service.getStatus()
-                        .subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<CameraStatusModel>() {
-                            @Override
-                            public void onCompleted() {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-                            }
-
-                            @Override
-                            public void onNext(CameraStatusModel cameraStatusModel) {
-                                Log.d("getStatus",  ""+cameraStatusModel.getStatusModel().getBattery() );
-                            }
-                        });
-
+//                service.getStatus()
+//                        .subscribeOn(Schedulers.newThread())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(new Subscriber<CameraStatusModel>() {
+//                            @Override
+//                            public void onCompleted() {}
+//
+//                            @Override
+//                            public void onError(Throwable e) {}
+//
+//                            @Override
+//                            public void onNext(CameraStatusModel cameraStatusModel) {
+//                                Log.d("getStatus",  ""+cameraStatusModel.getStatusModel().getBattery() );
+//                            }
+//                        });
                 Intent myIntent = new Intent(getActivity(), DeviceSettingActivity.class);
                 getActivity().startActivity(myIntent);
 
@@ -305,6 +311,26 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
             default:
                 break;
         }
+    }
+
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        Utility.toast(parent.getSelectedItem().toString(), getActivity());
+        if(parent.getItemAtPosition(pos).toString().equals("1080")){
+            service.setResolution("9").subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe();
+        } else{
+            service.setResolution("12").subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe();
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 
     private void stopRecording() {
@@ -339,4 +365,9 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
     }
+
+//    public void addListenerOnSpinnerItemSelection() {
+////        Spinner spinner1 = (Spinner) rootView.findViewById(R.id.spinnerTest);
+////        spinner1.setOnItemSelectedListener(new CustomOnItemSelectedListener());
+//    }
 }
