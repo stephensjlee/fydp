@@ -19,7 +19,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/spinner_res"
         android:layout_marginTop="48dp"
-        android:entries="@array/frameRate_arrays"
         android:prompt="@string/frameRate" />
 
     <Spinner
@@ -28,7 +27,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/spinner_fr"
         android:layout_marginTop="44dp"
-        android:entries="@array/fov_arrays"
         android:prompt="@string/fov" />
 
     <!--<RadioButton-->
