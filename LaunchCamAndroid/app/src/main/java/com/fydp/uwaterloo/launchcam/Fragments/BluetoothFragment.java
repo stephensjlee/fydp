@@ -2,62 +2,32 @@ package com.fydp.uwaterloo.launchcam.Fragments;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.fydp.uwaterloo.launchcam.AsyncTasks.ConnectRequest;
 import com.fydp.uwaterloo.launchcam.DeviceSettingActivity;
-import com.fydp.uwaterloo.launchcam.ImageActivity;
-import com.fydp.uwaterloo.launchcam.MainActivity;
-import com.fydp.uwaterloo.launchcam.Model.CameraModel;
 import com.fydp.uwaterloo.launchcam.Model.CameraStatusModel;
 import com.fydp.uwaterloo.launchcam.R;
 import com.fydp.uwaterloo.launchcam.Service.CameraService;
 import com.fydp.uwaterloo.launchcam.Service.ServiceFactory;
 import com.fydp.uwaterloo.launchcam.Utility;
-import com.fydp.uwaterloo.launchcam.VideoActivity;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import retrofit.http.HEAD;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-import static android.R.attr.mode;
-import static android.content.ContentValues.TAG;
 import static android.os.Looper.getMainLooper;
 
 /**
@@ -273,7 +243,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                 if(mediaSwitch.getTag().equals(R.drawable.ic_videocam_black_36dp)){
                     mediaSwitch.setBackgroundResource(R.drawable.ic_camera_alt_black_36dp);
                     mediaSwitch.setTag(R.drawable.ic_camera_alt_black_36dp);
-                    recordBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.material_deep_teal_200)));
+                    recordBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorRecord)));
                     recordBtn.setTag(VIDEO_MODE);
                     setPrimaryMode(Modes.VIDEO.getValue());
                 } else{
@@ -297,7 +267,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         // send command to stop recording
         service.record(0).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Utility.defaultSubscriber);
+                .subscribe(Utility.getDefaultSub());
         isRecording = false;
     }
 
@@ -309,7 +279,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         // send command to stop recording
         service.record(1).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Utility.defaultSubscriber);
+                .subscribe(Utility.getDefaultSub());
         isRecording = true;
     }
 
@@ -323,6 +293,6 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         // send command to stop recording
         service.primaryMode(mode).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Utility.defaultSubscriber);
+                .subscribe(Utility.getDefaultSub());
     }
 }

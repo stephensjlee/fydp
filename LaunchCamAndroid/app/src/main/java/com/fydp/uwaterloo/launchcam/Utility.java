@@ -21,18 +21,21 @@ public class Utility {
     public static final int SUCCESS_CONNECT = 0;
     public static final int MESSAGE_READ = 1;
     public static String tag = "debugging";
-    public static final Subscriber<CameraModel> defaultSubscriber = new Subscriber<CameraModel>() {
-        @Override
-        public void onCompleted() {}
-
-        @Override
-        public void onError(Throwable e) {}
-
-        @Override
-        public void onNext(CameraModel cameraModel) {}
-    };
     public static void toast(String msg, Context context){
         Toast.makeText(context, msg,Toast.LENGTH_LONG).show();
+    }
+
+    public static Subscriber<CameraModel> getDefaultSub(){
+        return new Subscriber<CameraModel>() {
+            @Override
+            public void onCompleted() {}
+
+            @Override
+            public void onError(Throwable e) {}
+
+            @Override
+            public void onNext(CameraModel cameraModel) {}
+        };
     }
 
     public static final Map<String, String> RESOLUTION = new HashMap<String, String>()

@@ -98,19 +98,19 @@ public class DeviceSettingActivity extends AppCompatActivity implements AdapterV
     private void setResolution(String resolution){
         service.setResolution(resolution).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Utility.defaultSubscriber);
+                .subscribe(Utility.getDefaultSub());
     }
 
     private void setFrameRate(String frameRate){
         service.setFrameRate(frameRate).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Utility.defaultSubscriber);
+                .subscribe(Utility.getDefaultSub());
     }
 
     private void setFOV(String fov){
         service.setFOV(fov).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Utility.defaultSubscriber);
+                .subscribe(Utility.getDefaultSub());
     }
 
     private void setFrameRateOptions(String key){
