@@ -63,7 +63,7 @@ import static android.os.Looper.getMainLooper;
 /**
  * Created by Said Afifi on 15-Jul-16.
  */
-public class BluetoothFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener{
+public class BluetoothFragment extends Fragment implements View.OnClickListener{
 
     View rootView = null;
     private boolean isRecording = false;
@@ -71,6 +71,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener,
     private final String VIDEO_MODE = "videoMode";
     private final String PICTURE_MODE = "pictureMode";
     long startTime;
+    String currentRes = "1080", currentFR = "30", currentFOV = "Wide";
 
     TextView timerTv;
     Handler clockHandler;
@@ -124,21 +125,6 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener,
         }, 2000, 5000);
 
         clockHandler = new Handler(getMainLooper());
-
-
-//        Spinner spinner2 = (Spinner) rootView.findViewById(R.id.spinnerTest);
-//        List<String> list = new ArrayList<String>();
-//        list.add("list 1");
-//        list.add("list 2");
-//        list.add("list 3");
-//        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
-//                android.R.layout.simple_spinner_dropdown_item, list);
-//        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        spinner2.setAdapter(dataAdapter);
-
-        Spinner spinner1 = (Spinner) rootView.findViewById(R.id.spinnerTest);
-        spinner1.setOnItemSelectedListener(this);
-
         return rootView;
     }
 
@@ -202,6 +188,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener,
                             default:
                                 break;
                         }
+                        currentRes = vidResolution;
                         // update video resolution and frame rate
                         String frameRate = "";
                         switch (settingsModel.getFrameRate()){
@@ -220,20 +207,25 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener,
                             default:
                                 break;
                         }
+                        currentFR = frameRate;
                         resolution.setText(String.format("%s-%sHz", vidResolution, frameRate));
                         // update field of view
                         TextView fov = (TextView) rootView.findViewById(R.id.field_of_view);
                         switch (settingsModel.getFieldOfView()){
                             case 0:
+                                currentFOV = "Wide";
                                 fov.setText("Wide");
                                 break;
                             case 1:
+                                currentFOV = "Medium";
                                 fov.setText("Medium");
                                 break;
                             case 2:
+                                currentFOV = "Narrow";
                                 fov.setText("Narrow");
                                 break;
                             case 4:
+                                currentFOV = "Linear";
                                 fov.setText("Linear");
                                 break;
                             default:
@@ -268,6 +260,9 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener,
                 break;
             case R.id.options_btn:
                 Intent myIntent = new Intent(getActivity(), DeviceSettingActivity.class);
+                myIntent.putExtra("resolution", currentRes);
+                myIntent.putExtra("frameRate", currentFR);
+                myIntent.putExtra("fov", currentFOV);
                 getActivity().startActivity(myIntent);
                 break;
             case R.id.bluetooth_btn:
@@ -298,31 +293,11 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        Utility.toast(parent.getSelectedItem().toString(), getActivity());
-        if(parent.getItemAtPosition(pos).toString().equals("1080")){
-            service.setResolution("9").subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe();
-        } else{
-            service.setResolution("12").subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe();
-        }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
-    }
-
     private void stopRecording() {
         // send command to stop recording
         service.record(0).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+                .subscribe(Utility.defaultSubscriber);
         isRecording = false;
     }
 
@@ -334,7 +309,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener,
         // send command to stop recording
         service.record(1).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+                .subscribe(Utility.defaultSubscriber);
         isRecording = true;
     }
 
@@ -348,11 +323,6 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener,
         // send command to stop recording
         service.primaryMode(mode).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+                .subscribe(Utility.defaultSubscriber);
     }
-
-//    public void addListenerOnSpinnerItemSelection() {
-////        Spinner spinner1 = (Spinner) rootView.findViewById(R.id.spinnerTest);
-////        spinner1.setOnItemSelectedListener(new CustomOnItemSelectedListener());
-//    }
 }

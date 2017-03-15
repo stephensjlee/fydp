@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.androidplot.Plot;
@@ -61,13 +62,13 @@ public class StreamingDataFragment extends Fragment {
     private ArrayAdapter<String> fileListAdapter;
     private ArrayList<String> fileNames;
     private XYPlot aprHistoryPlot = null;
-    private EditText graphToDraw;
+    private Spinner graphToDraw;
 
     private SimpleXYSeries altitude;
     private SimpleXYSeries altitudeHistory = null;
 
     private Redrawer redrawer;
-    private String FILE_NAMES="FILE_NAMES";
+    private String FILE_NAMES = "FILE_NAMES";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -81,21 +82,39 @@ public class StreamingDataFragment extends Fragment {
         Button getDataBtn = (Button) rootView.findViewById(R.id.btn_getData);
         Button storeBtn = (Button) rootView.findViewById(R.id.btn_store);
         Button clearGraphBtn = (Button) rootView.findViewById(R.id.btn_clearGraph);
-        graphToDraw = (EditText) rootView.findViewById(R.id.et_graphToDraw);
+        graphToDraw = (Spinner) rootView.findViewById(R.id.sp_graphSpinner);
         ListView fileList = (ListView) rootView.findViewById(R.id.lv_fileList);
         currentData = new ArrayList<>();
         loadFileNames();
-        fileListAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1,fileNames);
+        fileListAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, fileNames);
         fileList.setAdapter(fileListAdapter);
+// Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.graph_array, android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        graphToDraw.setAdapter(adapter);
+        graphToDraw.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                altitudeHistory.setTitle(parent.getSelectedItem().toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         getDataBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 String tmp = BLUETOOTH_STR_LOG;
-                if(((MainActivity) getActivity()).connectedThread != null)
+                if (((MainActivity) getActivity()).connectedThread != null)
                     ((MainActivity) getActivity()).connectedThread.write(tmp.getBytes());
-                else{
+                else {
                     Utility.toast("No Bluetooth Connection", getActivity());
                 }
             }
@@ -127,10 +146,7 @@ public class StreamingDataFragment extends Fragment {
             }
         });
 
-//        altitudeHistory = new SimpleXYSeries("Raw");
-//        altitudeHistory.useImplicitXVals();
-
-        altitudeHistory = new SimpleXYSeries("AGL");
+        altitudeHistory = new SimpleXYSeries("Raw");
         altitudeHistory.useImplicitXVals();
 
         aprHistoryPlot.setRangeBoundaries(900, 1050, BoundaryMode.AUTO);
@@ -168,8 +184,12 @@ public class StreamingDataFragment extends Fragment {
         currentData.clear();
     }
 
+    int currentLogNum = 0;
+
     private void fileClick(final String fileName) {
         clearData();
+        ++currentLogNum;
+        final int threadCount = currentLogNum;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -179,6 +199,7 @@ public class StreamingDataFragment extends Fragment {
                     BufferedReader br = new BufferedReader(new FileReader(file));
                     String line;
                     while ((line = br.readLine()) != null) {
+                        if (currentLogNum != threadCount) break;
                         SystemClock.sleep(10);
                         final String finalLine = line;
                         getActivity().runOnUiThread(new Runnable() {
@@ -188,8 +209,7 @@ public class StreamingDataFragment extends Fragment {
                         });
                     }
                     br.close();
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     Log.e("StreamingData", "Read File: ", e);
                 }
             }
@@ -201,12 +221,12 @@ public class StreamingDataFragment extends Fragment {
         try {
             File path = getActivity().getExternalFilesDir(null);
             File file = new File(path, fileName);
-            if (file.delete()){
+            if (file.delete()) {
                 Log.d("StreamingData", "File was deleted");
-            }else{
+            } else {
                 Log.e("StreamingData", "File was not deleted");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.e("StreamingData", "onItemLongClick: ", e);
         }
         fileNames.remove(position);
@@ -217,25 +237,29 @@ public class StreamingDataFragment extends Fragment {
         fileNames = new ArrayList<>();
         File path = getActivity().getExternalFilesDir(null);
         for (File file : path.listFiles()) {
-            if (file.isFile()){
+            if (file.isFile()) {
                 fileNames.add(file.getName());
             }
         }
     }
 
     private void storeCurrentData() {
+        final String[] clone = new String[currentData.size()];
+        for (int i = 0; i < clone.length; i++) {
+            clone[i] = currentData.get(i);
+        }
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 String fileName = "";
                 try {
-                    fileName = DateFormat.getDateTimeInstance().format(new Date())+".log";
+                    fileName = DateFormat.getDateTimeInstance().format(new Date()) + ".log";
                     File path = getActivity().getExternalFilesDir(null);
                     File file = new File(path, fileName);
                     FileOutputStream stream = new FileOutputStream(file);
 
-                    for (String line : currentData) {
+                    for (String line : clone) {
                         stream.write(line.getBytes());
                         stream.write("\n".getBytes());
                     }
@@ -246,7 +270,7 @@ public class StreamingDataFragment extends Fragment {
                 final String finalFileName = fileName;
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        if(!finalFileName.equals("")) {
+                        if (!finalFileName.equals("")) {
                             fileNames.add(0, finalFileName);
                             fileListAdapter.notifyDataSetChanged();
                         }
@@ -278,22 +302,33 @@ public class StreamingDataFragment extends Fragment {
     // Called whenever a new orSensor reading is taken.
 
     public void handleDataToDraw(String readBuf) {
-        currentData.add(readBuf);
-        int graphNum = Integer.parseInt(graphToDraw.getText().toString());
-        float value = parseData(readBuf,graphNum);
-        // use the data appropriately
-        draw(value);
+        try {
+            currentData.add(readBuf);
+            float value = parseData(readBuf, graphToDraw.getSelectedItemPosition());
+            // use the data appropriately
+            draw(value);
+        } catch (Exception e) {
+            Utility.toast("Incorrect input", getActivity());
+        }
     }
 
+    float last = 0;
+
     private float parseData(String readBuf, int graphNum) {
-        String[] split = readBuf.split(",");
-        return Float.parseFloat(split[graphNum]);
+        try {
+            String[] split = readBuf.split(",");
+            last = Float.parseFloat(split[graphNum]);
+            return last;
+        } catch (Exception e) {
+            Log.d(Utility.tag, "parseData: Failed to parse");
+        }
+        return last;
     }
 
     public void draw(float value) {
         // get rid the oldest sample in history:
-        if( value >2000 ) value = 2000;
-        if( value < -5 ) value = -5;
+        if (value > 2000) value = 2000;
+        if (value < -5) value = -5;
 
         if (altitudeHistory.size() > HISTORY_SIZE) {
             altitudeHistory.removeFirst();

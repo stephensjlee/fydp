@@ -20,8 +20,6 @@ public class SampleGridViewAdapter extends BaseAdapter {
         this.context = context;
 
         urls.addAll(listUrl);
-        System.out.println(urls);
-
     }
 
     @Override public View getView(int position, View convertView, ViewGroup parent) {

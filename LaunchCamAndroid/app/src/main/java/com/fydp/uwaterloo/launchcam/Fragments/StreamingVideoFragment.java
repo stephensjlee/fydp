@@ -36,7 +36,7 @@ public class StreamingVideoFragment extends Fragment implements AsyncResponse{
         this.output.clear();
         this.output.addAll(videoFileNames);
         this.output.addAll(pictureFileNames);
-        System.out.println("async repsonse process finsihed");
+//        System.out.println("async repsonse process finsihed");
         adapter.notifyDataSetChanged();
 
     }
@@ -60,7 +60,7 @@ public class StreamingVideoFragment extends Fragment implements AsyncResponse{
                                     int position, long id) {
                 final String item = (String) parent.getItemAtPosition(position);
 
-                System.out.println(item);
+//                System.out.println(item);
                 if(item.contains("JPG")){
                     Intent myIntent = new Intent(getActivity(), ImageActivity.class);
                     String url = "http://10.5.5.9:8080/videos/DCIM/112GOPRO/" + item;
