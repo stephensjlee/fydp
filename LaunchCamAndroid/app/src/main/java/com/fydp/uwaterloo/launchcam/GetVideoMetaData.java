@@ -64,6 +64,7 @@ public class GetVideoMetaData extends AsyncTask<String, Void, Void> {
         super.onPostExecute(aVoid);
         try {
             JSONObject obj = new JSONObject(toPrint);
+            System.out.println(obj);
             JSONArray jsonArray = obj.getJSONArray("media");
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject row = jsonArray.getJSONObject(i);

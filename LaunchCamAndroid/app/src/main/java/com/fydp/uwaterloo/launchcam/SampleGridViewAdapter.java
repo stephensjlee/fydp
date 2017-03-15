@@ -35,16 +35,18 @@ public class SampleGridViewAdapter extends BaseAdapter {
         String url = getItem(position);
 
 
-        if(url.contains("JPG")){
-            // Trigger the download of the URL asynchronously into the image view.
-            Picasso.with(context) //
-                    .load("http://10.5.5.9:8080/videos/DCIM/112GOPRO/" + url) //
-                    .placeholder(R.mipmap.ic_launcher) //
-                    .error(R.drawable.battery_1) //
-                    .resize(128, 128)
-                    .tag(context) //
-                    .into(view);
-        }else if(url.contains("LRV")){
+//        if(url.contains("JPG")){
+//            System.out.println(url);
+//            // Trigger the download of the URL asynchronously into the image view.
+//            Picasso.with(context) //
+//                    .load(R.drawable.camera_icon_68860) //
+//                    .placeholder(R.mipmap.ic_launcher) //
+//                    .error(R.drawable.battery_1) //
+//                    .fit()
+//                    .tag(context) //
+//                    .into(view);
+//        }else
+            if(url.contains("LRV")){
 
             // Trigger the download of the URL asynchronously into the image view.
             Picasso.with(context) //

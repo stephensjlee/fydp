@@ -27,15 +27,10 @@ public class ImageActivity extends AppCompatActivity {
         url = intent.getStringExtra("url");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_view);
-        view = (ImageView)findViewById(R.id.imageView);
-
+        new DownloadImageTask((ImageView) findViewById(R.id.imageView))
+                .execute(url);
 
 
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Picasso.with(this).load(url).into(view);
-    }
 }
