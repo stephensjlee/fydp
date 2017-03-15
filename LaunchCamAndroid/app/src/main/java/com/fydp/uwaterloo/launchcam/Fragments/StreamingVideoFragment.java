@@ -44,12 +44,6 @@ public class StreamingVideoFragment extends Fragment implements AsyncResponse{
         adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        adapter.notifyDataSetChanged();
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

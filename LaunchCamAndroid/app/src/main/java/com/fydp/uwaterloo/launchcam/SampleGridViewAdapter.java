@@ -14,12 +14,12 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 public class SampleGridViewAdapter extends BaseAdapter {
     private final Context context;
-    private final List<String> urls = new ArrayList<>();
+    private List<String> urls;
 
     public SampleGridViewAdapter(Context context, List<String> listUrl) {
         this.context = context;
 
-        urls.addAll(listUrl);
+        urls= listUrl;
     }
 
     @Override public View getView(int position, View convertView, ViewGroup parent) {
