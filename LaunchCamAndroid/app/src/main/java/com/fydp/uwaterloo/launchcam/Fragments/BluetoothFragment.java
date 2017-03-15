@@ -125,7 +125,6 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         }, 2000, 5000);
 
         clockHandler = new Handler(getMainLooper());
-
         return rootView;
     }
 
@@ -298,7 +297,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         // send command to stop recording
         service.record(0).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+                .subscribe(Utility.defaultSubscriber);
         isRecording = false;
     }
 
@@ -310,7 +309,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         // send command to stop recording
         service.record(1).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+                .subscribe(Utility.defaultSubscriber);
         isRecording = true;
     }
 
@@ -324,6 +323,6 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         // send command to stop recording
         service.primaryMode(mode).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+                .subscribe(Utility.defaultSubscriber);
     }
 }

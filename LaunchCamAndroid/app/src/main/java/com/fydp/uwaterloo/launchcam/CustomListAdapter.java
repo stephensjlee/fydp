@@ -43,7 +43,6 @@ public class CustomListAdapter extends BaseAdapter {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        System.out.println("convertView null:" + (convertView == null));
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_row_layout, null);
             holder = new ViewHolder();
@@ -59,8 +58,6 @@ public class CustomListAdapter extends BaseAdapter {
         holder.headlineView.setText(string);
         if(string.contains("LRV")){
             Picasso.with(context).load("http://10.5.5.9:8080/videos/DCIM/112GOPRO/" + string.replace("LRV", "THM")).into(holder.imageView);
-            System.out.println("Custom list adapter url: " + string);
-
         }else{
             holder.imageView.setImageDrawable(ContextCompat.getDrawable(context, R.mipmap.ic_launcher));
         }
