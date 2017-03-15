@@ -132,16 +132,14 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@drawable/ic_view_module_black_48dp"
-            app:backgroundTint="@android:color/white"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true" />
 
         <Button
             android:id="@+id/mediaSwitch"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="@drawable/ic_camera_alt_black_36dp"
-            app:backgroundTint="@android:color/white"
             android:layout_centerInParent="true"
             android:tag="ic_camera_alt_black_36dp"/>
 
@@ -155,8 +153,7 @@
             android:id="@+id/bluetooth_btn"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="@drawable/ic_bluetooth_black_48dp"
-            app:backgroundTint="@android:color/white"
+            android:background="@drawable/ic_power_settings_new_black_48dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true" />
 
