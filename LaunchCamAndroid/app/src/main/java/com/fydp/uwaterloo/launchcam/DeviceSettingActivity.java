@@ -2,7 +2,6 @@ package com.fydp.uwaterloo.launchcam;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -13,14 +12,11 @@ import android.widget.Spinner;
 import com.fydp.uwaterloo.launchcam.Service.CameraService;
 import com.fydp.uwaterloo.launchcam.Service.ServiceFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-
-import static android.R.id.list;
 
 /**
  * Created by Sahil on 3/13/2017.
@@ -49,12 +45,12 @@ public class DeviceSettingActivity extends AppCompatActivity implements AdapterV
         setInitialValue(res_spinner, currentRes);
 
         fr_spinner = (Spinner) findViewById(R.id.spinner_fr);
-        setFrameRateOptions();
+        setFrameRateOptions(currentRes);
         fr_spinner.setOnItemSelectedListener(this);
         setInitialValue(fr_spinner, currentFR);
 
         fov_spinner = (Spinner) findViewById(R.id.spinner_fov);
-        setFieldViewOptions();
+        setFieldViewOptions(currentRes);
         fov_spinner.setOnItemSelectedListener(this);
         setInitialValue(fov_spinner, currentFOV);
     }
@@ -78,8 +74,8 @@ public class DeviceSettingActivity extends AppCompatActivity implements AdapterV
                 Log.d("Resolution", Utility.RESOLUTION.get(selectedVal));
                 setResolution(Utility.RESOLUTION.get(selectedVal));
                 // the frame rate and field of view depend on the resolution
-                setFieldViewOptions();
-                setFrameRateOptions();
+                setFieldViewOptions(selectedVal);
+                setFrameRateOptions(selectedVal);
                 break;
             case R.id.spinner_fr:
                 Log.d("Frame Rate", Utility.FRAME_RATE.get(selectedVal));
@@ -117,8 +113,8 @@ public class DeviceSettingActivity extends AppCompatActivity implements AdapterV
                 .subscribe(Utility.defaultSubscriber);
     }
 
-    private void setFrameRateOptions(){
-        String[] fr_options = Utility.FR_DATA.get(res_spinner.getSelectedItem().toString()).split(",");
+    private void setFrameRateOptions(String key){
+        String[] fr_options = Utility.FR_DATA.get(key).split(",");
         List<String> fr_list = Arrays.asList(fr_options);
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, fr_list);
@@ -126,8 +122,8 @@ public class DeviceSettingActivity extends AppCompatActivity implements AdapterV
         fr_spinner.setAdapter(dataAdapter);
     }
 
-    private void setFieldViewOptions(){
-        String[] fov_options = Utility.FOV_DATA.get(res_spinner.getSelectedItem().toString()).split(",");
+    private void setFieldViewOptions(String key){
+        String[] fov_options = Utility.FOV_DATA.get(key).split(",");
         List<String> fov_list = Arrays.asList(fov_options);
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, fov_list);

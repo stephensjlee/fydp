@@ -71,7 +71,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
     private final String VIDEO_MODE = "videoMode";
     private final String PICTURE_MODE = "pictureMode";
     long startTime;
-    String currentRes, currentFR, currentFOV = "";
+    String currentRes = "1080", currentFR = "30", currentFOV = "Wide";
 
     TextView timerTv;
     Handler clockHandler;
