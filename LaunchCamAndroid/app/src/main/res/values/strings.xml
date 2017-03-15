@@ -16,6 +16,14 @@
         <item>WVGA</item>
     </string-array>
 
+    <string-array name="graph_array">
+        <item>Raw</item>
+        <item>Filtered</item>
+        <item>Differential</item>
+        <item>AGL</item>
+        <item>State</item>
+    </string-array>
+
     <string-array name="frameRate_arrays">
         <item>240</item>
         <item>120</item>
