@@ -15,13 +15,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fydp.uwaterloo.launchcam.AsyncTasks.ConnectRequest;
+import com.fydp.uwaterloo.launchcam.DeviceSettingActivity;
+import com.fydp.uwaterloo.launchcam.ImageActivity;
 import com.fydp.uwaterloo.launchcam.MainActivity;
 import com.fydp.uwaterloo.launchcam.Model.CameraModel;
 import com.fydp.uwaterloo.launchcam.Model.CameraStatusModel;
@@ -38,11 +44,14 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import retrofit.http.HEAD;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -62,6 +71,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
     private final String VIDEO_MODE = "videoMode";
     private final String PICTURE_MODE = "pictureMode";
     long startTime;
+    String currentRes = "1080", currentFR = "30", currentFOV = "Wide";
 
     TextView timerTv;
     Handler clockHandler;
@@ -119,7 +129,6 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
     }
 
     private void updateStatus() {
-        Log.d("updateStatus", "updateStatus: ");
         service.getStatus()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -179,6 +188,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                             default:
                                 break;
                         }
+                        currentRes = vidResolution;
                         // update video resolution and frame rate
                         String frameRate = "";
                         switch (settingsModel.getFrameRate()){
@@ -197,20 +207,25 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                             default:
                                 break;
                         }
+                        currentFR = frameRate;
                         resolution.setText(String.format("%s-%sHz", vidResolution, frameRate));
                         // update field of view
                         TextView fov = (TextView) rootView.findViewById(R.id.field_of_view);
                         switch (settingsModel.getFieldOfView()){
                             case 0:
+                                currentFOV = "Wide";
                                 fov.setText("Wide");
                                 break;
                             case 1:
+                                currentFOV = "Medium";
                                 fov.setText("Medium");
                                 break;
                             case 2:
+                                currentFOV = "Narrow";
                                 fov.setText("Narrow");
                                 break;
                             case 4:
+                                currentFOV = "Linear";
                                 fov.setText("Linear");
                                 break;
                             default:
@@ -244,36 +259,11 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                 }
                 break;
             case R.id.options_btn:
-//                ImageView wifiIcon = (ImageView) rootView.findViewById(R.id.wifi);
-//                if(wifiIcon.getTag().equals(R.drawable.wifi_full)){
-//                    wifiIcon.setImageResource(0);
-//                    wifiIcon.setImageResource(R.drawable.wifi_low);
-//                    wifiIcon.setTag(R.drawable.wifi_low);
-//                } else{
-//                    wifiIcon.setImageResource(0);
-//                    wifiIcon.setImageResource(R.drawable.wifi_full);
-//                    wifiIcon.setTag(R.drawable.wifi_full);
-//                }
-                service.getStatus()
-                        .subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<CameraStatusModel>() {
-                            @Override
-                            public void onCompleted() {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-                            }
-
-                            @Override
-                            public void onNext(CameraStatusModel cameraStatusModel) {
-                                Log.d("getStatus",  ""+cameraStatusModel.getStatusModel().getBattery() );
-                            }
-                        });
-
+                Intent myIntent = new Intent(getActivity(), DeviceSettingActivity.class);
+                myIntent.putExtra("resolution", currentRes);
+                myIntent.putExtra("frameRate", currentFR);
+                myIntent.putExtra("fov", currentFOV);
+                getActivity().startActivity(myIntent);
                 break;
             case R.id.bluetooth_btn:
                 new ConnectRequest().execute();
@@ -307,7 +297,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         // send command to stop recording
         service.record(0).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+                .subscribe(Utility.defaultSubscriber);
         isRecording = false;
     }
 
@@ -319,7 +309,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         // send command to stop recording
         service.record(1).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+                .subscribe(Utility.defaultSubscriber);
         isRecording = true;
     }
 
@@ -333,6 +323,6 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         // send command to stop recording
         service.primaryMode(mode).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+                .subscribe(Utility.defaultSubscriber);
     }
 }

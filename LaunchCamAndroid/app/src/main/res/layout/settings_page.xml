@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="30dp"
+    android:weightSum="1">
+
+    <Spinner
+        android:id="@+id/spinner_res"
+        android:layout_width="167dp"
+        android:layout_height="wrap_content"
+        android:entries="@array/res_arrays"
+        android:prompt="@string/resolution"
+        />
+
+    <Spinner
+        android:id="@+id/spinner_fr"
+        android:layout_width="167dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinner_res"
+        android:layout_marginTop="48dp"
+        android:prompt="@string/frameRate" />
+
+    <Spinner
+        android:id="@+id/spinner_fov"
+        android:layout_width="167dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinner_fr"
+        android:layout_marginTop="44dp"
+        android:prompt="@string/fov" />
+
+    <!--<RadioButton-->
+        <!--android:id="@+id/radioButton"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_marginStart="52dp"-->
+        <!--android:layout_marginTop="23dp"-->
+        <!--android:text="RadioButton" />-->
+</RelativeLayout>

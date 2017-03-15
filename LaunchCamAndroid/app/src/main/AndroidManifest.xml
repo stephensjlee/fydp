@@ -34,12 +34,12 @@
         <activity
         android:name=".VideoActivity"
         android:theme="@style/AppTheme.NoActionBar"
-        android:screenOrientation="landscape"
-        />
+        android:screenOrientation="landscape" />
         <activity
             android:name=".ImageActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            />
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".DeviceSettingActivity" />
 
     </application>
 
