@@ -157,9 +157,9 @@ public class StreamingDataFragment extends Fragment {
         aprHistoryPlot.setDomainStepMode(XYStepMode.INCREMENT_BY_VAL);
         aprHistoryPlot.setDomainStepValue(HISTORY_SIZE / 10);
         aprHistoryPlot.setTicksPerRangeLabel(3);
-        aprHistoryPlot.setDomainLabel("Height feet");
+        aprHistoryPlot.setDomainLabel("Cycles (seconds * 100)");
         aprHistoryPlot.getDomainLabelWidget().pack();
-        aprHistoryPlot.setRangeLabel("Cycle");
+        aprHistoryPlot.setRangeLabel("Height Feet");
         aprHistoryPlot.getRangeLabelWidget().pack();
 
         aprHistoryPlot.setRangeValueFormat(new DecimalFormat("#"));
