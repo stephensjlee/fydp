@@ -236,7 +236,10 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                 getActivity().startActivity(myIntent);
                 break;
             case R.id.bluetooth_btn:
-                new ConnectRequest().execute();
+                ConnectRequest connectRequest = new ConnectRequest();
+                Button btn = (Button) rootView.findViewById(R.id.bluetooth_btn);
+                connectRequest.setButtonColor(btn);
+                connectRequest.execute();
                 break;
             case R.id.mediaSwitch:
                 Button mediaSwitch = (Button) rootView.findViewById(R.id.mediaSwitch);

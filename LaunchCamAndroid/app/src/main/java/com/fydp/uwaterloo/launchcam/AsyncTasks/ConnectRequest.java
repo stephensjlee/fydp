@@ -1,6 +1,9 @@
 package com.fydp.uwaterloo.launchcam.AsyncTasks;
 
 import android.os.AsyncTask;
+import android.widget.Button;
+
+import com.fydp.uwaterloo.launchcam.R;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -15,6 +18,8 @@ import java.net.UnknownHostException;
 
 public class ConnectRequest extends AsyncTask<String, Void, Void> {
     String toPrint = "";
+    private Button buttonColor;
+
     @Override
     protected Void doInBackground(String... params) {
         int port = 9;
@@ -68,6 +73,8 @@ public class ConnectRequest extends AsyncTask<String, Void, Void> {
 
     @Override
     protected void onPostExecute(Void aVoid) {
+        this.buttonColor.setBackgroundResource(R.drawable.ic_power_settings_new_black_48dp_on);
+
     }
 
     @Override
@@ -75,4 +82,8 @@ public class ConnectRequest extends AsyncTask<String, Void, Void> {
 
     @Override
     protected void onProgressUpdate(Void... values) {}
+
+    public void setButtonColor(Button buttonColor) {
+        this.buttonColor = buttonColor;
+    }
 }

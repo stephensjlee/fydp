@@ -1,9 +1,6 @@
 package com.fydp.uwaterloo.launchcam.Fragments;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
@@ -14,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -36,19 +32,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Created by Said Afifi on 15-Jul-16.
@@ -132,13 +120,13 @@ public class StreamingDataFragment extends Fragment {
             }
         });
 
-        fileList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                fileLongPress((TextView) view, position);
-                return false;
-            }
-        });
+//        fileList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                fileLongPress((TextView) view, position);
+//                return false;
+//            }
+//        });
         fileList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -157,10 +145,14 @@ public class StreamingDataFragment extends Fragment {
         aprHistoryPlot.setDomainStepMode(XYStepMode.INCREMENT_BY_VAL);
         aprHistoryPlot.setDomainStepValue(HISTORY_SIZE / 10);
         aprHistoryPlot.setTicksPerRangeLabel(3);
-        aprHistoryPlot.setDomainLabel("Cycles (seconds * 100)");
+        aprHistoryPlot.setDomainLabel("Cycles(sec*100)");
         aprHistoryPlot.getDomainLabelWidget().pack();
         aprHistoryPlot.setRangeLabel("Height Feet");
         aprHistoryPlot.getRangeLabelWidget().pack();
+        aprHistoryPlot.getDomainLabelWidget().getLabelPaint().setColor(Color.BLACK);
+        aprHistoryPlot.getRangeLabelWidget().getLabelPaint().setColor(Color.BLACK);
+
+
 
         aprHistoryPlot.setRangeValueFormat(new DecimalFormat("#"));
         aprHistoryPlot.setDomainValueFormat(new DecimalFormat("#"));
@@ -318,6 +310,22 @@ public class StreamingDataFragment extends Fragment {
         try {
             String[] split = readBuf.split(",");
             last = Float.parseFloat(split[graphNum]);
+            switch (graphNum){
+                case 0:
+                    if (last < 1100) last = 1100;
+                    break;
+                case 1:
+                    if (last < 1100) last = 1100;
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    if (last < -5) last = -5;
+                    break;
+                default:
+                    break;
+            }
+
             return last;
         } catch (Exception e) {
             Log.d(Utility.tag, "parseData: Failed to parse");
@@ -327,8 +335,6 @@ public class StreamingDataFragment extends Fragment {
 
     public void draw(float value) {
         // get rid the oldest sample in history:
-        if (value > 2000) value = 2000;
-        if (value < -5) value = -5;
 
         if (altitudeHistory.size() > HISTORY_SIZE) {
             altitudeHistory.removeFirst();

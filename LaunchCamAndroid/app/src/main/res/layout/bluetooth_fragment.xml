@@ -153,7 +153,7 @@
             android:id="@+id/bluetooth_btn"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="@drawable/ic_power_settings_new_black_48dp"
+            android:background="@drawable/ic_power_settings_new_black_48dp_off"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true" />
 
