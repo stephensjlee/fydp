@@ -217,6 +217,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                     if(!isRecording){
                         // send command to record
                         triggerShutter();
+                        isRecording = true;
                         clockHandler.postDelayed(clockRunner, 10);
                     } else{
                         // send command to stop recording
@@ -243,20 +244,19 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
                 break;
             case R.id.mediaSwitch:
                 Button mediaSwitch = (Button) rootView.findViewById(R.id.mediaSwitch);
-                if(mediaSwitch.getTag().equals(R.drawable.ic_videocam_black_36dp)){
-                    mediaSwitch.setBackgroundResource(R.drawable.ic_camera_alt_black_36dp);
-                    mediaSwitch.setTag(R.drawable.ic_camera_alt_black_36dp);
-                    recordBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorRecord)));
+                if(mediaSwitch.getTag().equals(R.drawable.ic_camera_alt_black_36dp)){
+                    mediaSwitch.setBackgroundResource(R.drawable.ic_videocam_black_36dp);
+                    mediaSwitch.setTag(R.drawable.ic_videocam_black_36dp);
                     recordBtn.setTag(VIDEO_MODE);
                     setPrimaryMode(Modes.VIDEO.getValue());
                 } else{
-                    mediaSwitch.setBackgroundResource(R.drawable.ic_videocam_black_36dp);
-                    mediaSwitch.setTag(R.drawable.ic_videocam_black_36dp);
-                    recordBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.primary_dark_material_dark)));
+                    mediaSwitch.setBackgroundResource(R.drawable.ic_camera_alt_black_36dp);
+                    mediaSwitch.setTag(R.drawable.ic_camera_alt_black_36dp);
                     recordBtn.setTag(PICTURE_MODE);
                     // if switch to camera mode in middle of recording, stop recording
                     if(isRecording){
                         stopRecording();
+                        clockHandler.removeCallbacks(clockRunner);
                     }
                     setPrimaryMode(Modes.PICTURE.getValue());
                 }
@@ -283,7 +283,6 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener{
         service.record(1).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(Utility.getDefaultSub());
-        isRecording = true;
     }
 
     /**
